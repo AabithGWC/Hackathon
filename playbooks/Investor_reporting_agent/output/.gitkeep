@@ -1,0 +1,10 @@
+Generated artefacts are written here by `python agent_runner.py`:
+
+  generated_investor_report.json   the frontend contract (validated against
+                                   config/output_schema.json on every run)
+  reporting_assistant.html         standalone reporting-assistant screen
+  generated_commentary.md          the full review pack
+  generated_commentary.pdf         printable board pack
+
+Nothing here is committed. The figures come from sample_data/, so a stale file
+checked into the repo would be mistaken for the current quarter.

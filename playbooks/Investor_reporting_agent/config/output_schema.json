@@ -1,0 +1,474 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Atlas Hub - Investor Reporting Agent output payload",
+  "description": "Contract between the Investor/Board Reporting Agent and the Atlas Hub Investor Reporting screen. Every top-level key maps to a named panel on that screen.",
+  "type": "object",
+  "required": [
+    "meta",
+    "kpi_comparison",
+    "budget_variance",
+    "stage_movement",
+    "risk_attention_items",
+    "source_traceability",
+    "report_readiness",
+    "ai_commentary"
+  ],
+  "properties": {
+
+    "meta": {
+      "type": "object",
+      "description": "Header context for the screen.",
+      "required": ["company_name", "reporting_quarter", "prior_quarter", "yoy_quarter", "generated_at"],
+      "properties": {
+        "company_name": { "type": "string" },
+        "platform": { "type": "string" },
+        "module": { "type": "string" },
+        "reporting_quarter": { "type": "string", "examples": ["Q1 FY27"] },
+        "prior_quarter": { "type": "string", "examples": ["Q4 FY26"] },
+        "yoy_quarter": { "type": "string", "examples": ["Q1 FY26"] },
+        "forecast_quarter": { "type": ["string", "null"], "examples": ["Q2 FY27"] },
+        "accounting_standard": { "type": "string" },
+        "ecl_standard": { "type": "string" },
+        "currency_symbol": { "type": "string" },
+        "reporting_unit": { "type": "string" },
+        "confidentiality": { "type": "string" },
+        "audience": { "type": "string", "enum": ["investor", "board"] },
+        "generated_at": { "type": "string" },
+        "degraded_run": { "type": "boolean", "description": "True when the LLM was unreachable and the deterministic fallback drafted the commentary." }
+      }
+    },
+
+    "kpi_comparison": {
+      "type": "array",
+      "description": "Rows of the 'Quarter-over-quarter comparison' table, in render order.",
+      "items": {
+        "type": "object",
+        "required": ["metric_key", "label", "prior_actual", "current_actual", "qoq_change", "yoy_change"],
+        "properties": {
+          "metric_key": { "type": "string" },
+          "label": { "type": "string", "description": "METRIC column, e.g. 'AUM (₹ Cr)'" },
+          "short_label": { "type": "string" },
+          "unit": { "type": "string" },
+          "definition": { "type": "string", "description": "metric_definitions feed - how the metric is calculated." },
+          "order": { "type": "integer" },
+          "precision": { "type": "integer" },
+
+          "prior_actual": { "type": ["number", "null"], "description": "PRIOR ACTUAL column" },
+          "current_actual": { "type": ["number", "null"], "description": "CURRENT ACTUAL column" },
+          "yoy_actual": { "type": ["number", "null"], "description": "Same quarter one year earlier - basis of yoy_change." },
+          "forecast": { "type": ["number", "null"], "description": "FORECAST column. Null renders as a dash; the agent never invents this." },
+          "forecast_basis": { "type": ["string", "null"] },
+          "forecast_approved_by": { "type": ["string", "null"] },
+
+          "prior_actual_display": { "type": "string" },
+          "current_actual_display": { "type": "string" },
+          "forecast_display": { "type": "string" },
+
+          "change_type": { "type": "string", "enum": ["pct_change", "pp_change"] },
+          "qoq_change": { "type": ["number", "null"] },
+          "qoq_change_display": { "type": "string", "examples": ["+12.3%", "-0.20%"] },
+          "qoq_change_abs": { "type": ["number", "null"], "description": "Absolute movement in the metric's own unit." },
+          "yoy_change": { "type": ["number", "null"] },
+          "yoy_change_display": { "type": "string" },
+          "yoy_change_abs": { "type": ["number", "null"] },
+
+          "direction": { "type": "string", "enum": ["higher_is_better", "lower_is_better", "neutral"] },
+          "qoq_sentiment": { "type": "string", "enum": ["favourable", "adverse", "neutral"] },
+          "yoy_sentiment": { "type": "string", "enum": ["favourable", "adverse", "neutral"] },
+          "material": { "type": "boolean", "description": "False when the movement is below the configured materiality threshold - commentary must not narrate it as a change." },
+
+          "budget": { "type": ["number", "null"] },
+          "budget_variance": { "type": ["number", "null"] },
+          "budget_variance_pct": { "type": ["number", "null"] },
+
+          "source_system": { "type": "string" },
+          "source_system_label": { "type": "string" },
+          "computed": { "type": "boolean" },
+          "notes": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+
+    "budget_variance": {
+      "type": "object",
+      "description": "The 'Variance to budget' strip.",
+      "required": ["metric_key", "label", "variance", "variance_pct", "display"],
+      "properties": {
+        "metric_key": { "type": "string" },
+        "label": { "type": "string" },
+        "actual": { "type": "number" },
+        "budget": { "type": "number" },
+        "variance": { "type": "number" },
+        "variance_pct": { "type": "number" },
+        "display": { "type": "string", "examples": ["₹4.8 Cr (+1.1% vs budget)"] },
+        "sentiment": { "type": "string", "enum": ["favourable", "adverse", "neutral"] },
+        "basis": { "type": "string" },
+        "by_metric": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metric_key": { "type": "string" },
+              "label": { "type": "string" },
+              "actual": { "type": "number" },
+              "budget": { "type": "number" },
+              "variance": { "type": "number" },
+              "variance_pct": { "type": "number" },
+              "sentiment": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "stage_movement": {
+      "type": "object",
+      "description": "The 'Stage movement' card - portfolio migration & net flow.",
+      "required": ["rows", "net_flow"],
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "rows": {
+          "type": "array",
+          "description": "STAGE / CURRENT / FORECAST. An empty array renders 'No records found'.",
+          "items": {
+            "type": "object",
+            "required": ["stage", "label", "current"],
+            "properties": {
+              "stage": { "type": "string", "examples": ["stage1_cr"] },
+              "label": { "type": "string", "examples": ["Stage 1"] },
+              "description": { "type": "string" },
+              "current": { "type": ["number", "null"] },
+              "forecast": { "type": ["number", "null"] },
+              "prior": { "type": ["number", "null"] },
+              "current_display": { "type": "string" },
+              "forecast_display": { "type": "string" },
+              "current_share_pct": { "type": ["number", "null"] },
+              "forecast_share_pct": { "type": ["number", "null"] },
+              "qoq_change": { "type": ["number", "null"] },
+              "sentiment": { "type": "string" }
+            }
+          }
+        },
+        "net_flow": {
+          "type": "object",
+          "required": ["label", "value", "display"],
+          "properties": {
+            "label": { "type": "string", "examples": ["Net new flow to stage 3"] },
+            "value": { "type": "number" },
+            "prior": { "type": ["number", "null"] },
+            "display": { "type": "string", "examples": ["₹6.0 Cr"] },
+            "sentiment": { "type": "string" }
+          }
+        }
+      }
+    },
+
+    "risk_attention_items": {
+      "type": "array",
+      "description": "The 'Risk / attention items' card. Derived from risk_rules in input_config.yaml - never authored freely by the model.",
+      "items": {
+        "type": "object",
+        "required": ["id", "rule_id", "severity", "message"],
+        "properties": {
+          "id": { "type": "string" },
+          "rule_id": { "type": "string" },
+          "severity": { "type": "string", "enum": ["High", "Medium", "Low"] },
+          "category": { "type": "string" },
+          "message": { "type": "string", "description": "The one-line text rendered on the card." },
+          "detail": { "type": "string", "description": "Longer explanation shown on 'View all'." },
+          "metric_key": { "type": ["string", "null"] },
+          "segment": { "type": ["string", "null"] },
+          "evidence": { "type": "object", "description": "The exact figures that triggered the rule." },
+          "reviewed": { "type": "boolean", "default": false },
+          "visible_on_card": { "type": "boolean" }
+        }
+      }
+    },
+
+    "source_traceability": {
+      "type": "array",
+      "description": "The 'Source traceability' card.",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "system", "status"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string", "examples": ["AUM & Disbursements"] },
+          "system": { "type": "string", "examples": ["Portfolio MIS (Core Banking)"] },
+          "metrics": { "type": "array", "items": { "type": "string" } },
+          "feed": { "type": "string" },
+          "status": { "type": "string", "enum": ["verified", "partial", "unverified", "conflict"] },
+          "records_ingested": { "type": "integer" },
+          "metrics_computed": { "type": "integer" },
+          "metrics_expected": { "type": "integer" },
+          "issues": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+
+    "report_readiness": {
+      "type": "object",
+      "description": "The 'Report readiness' donut and its counters.",
+      "required": ["score", "total", "counters"],
+      "properties": {
+        "score": { "type": "number", "description": "Weighted completion, rendered in the donut centre." },
+        "total": { "type": "number" },
+        "completed": { "type": "number" },
+        "pending": { "type": "number" },
+        "counters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["key", "label", "done", "total"],
+            "properties": {
+              "key": { "type": "string" },
+              "label": { "type": "string" },
+              "done": { "type": "integer" },
+              "total": { "type": "integer" },
+              "display": { "type": "string", "examples": ["7 / 7"] },
+              "weight": { "type": "number" },
+              "owner": { "type": "string", "enum": ["agent", "human"] }
+            }
+          }
+        }
+      }
+    },
+
+    "ai_commentary": {
+      "type": "object",
+      "description": "The 'AI-generated commentary' panel - editable financial narratives drafted for deck inclusion.",
+      "required": ["tone", "tone_options", "sections"],
+      "properties": {
+        "tone": { "type": "string", "examples": ["board_formal"] },
+        "tone_label": { "type": "string", "examples": ["Board Formal"] },
+        "tone_options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" }
+            }
+          }
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "body", "status"],
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string", "examples": ["AUM & Growth Overview"] },
+              "order": { "type": "integer" },
+              "body": { "type": "string", "description": "The editable draft text shown in the textarea." },
+              "status": {
+                "type": "string",
+                "enum": ["draft", "accepted", "edited", "needs_review"],
+                "description": "Agent output is always 'draft' or 'needs_review'; the frontend advances it to 'accepted'."
+              },
+              "delta_badge": {
+                "type": "object",
+                "properties": {
+                  "text": { "type": "string", "examples": ["+₹137 Cr QoQ", "-0.20% GNPA"] },
+                  "sentiment": { "type": "string", "enum": ["favourable", "adverse", "neutral"] },
+                  "metric_key": { "type": "string" },
+                  "value": { "type": ["number", "null"] }
+                }
+              },
+              "word_count": { "type": "integer" },
+              "kpis_referenced": { "type": "array", "items": { "type": "string" } },
+              "figures_used": {
+                "type": "array",
+                "description": "Every figure quoted in the body, with the computed value it was matched against.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "quoted": { "type": "string" },
+                    "value": { "type": "number" },
+                    "matched_to": { "type": ["string", "null"] },
+                    "grounded": { "type": "boolean" }
+                  }
+                }
+              },
+              "flags": {
+                "type": "array",
+                "description": "Guardrail violations and unexplained movements. A non-empty array forces status 'needs_review'.",
+                "items": {
+                  "type": "object",
+                  "required": ["type", "message"],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["ungrounded_figure", "forward_looking", "causal_overreach", "banned_phrase", "unexplained_movement", "length", "missing_beat", "one_off_not_separated"]
+                    },
+                    "severity": { "type": "string", "enum": ["High", "Medium", "Low"] },
+                    "message": { "type": "string" },
+                    "excerpt": { "type": "string" }
+                  }
+                }
+              },
+              "unexplained_movements": { "type": "array", "items": { "type": "string" } },
+              "style_exemplars_used": { "type": "array", "items": { "type": "string" } },
+              "regenerate_count": { "type": "integer", "default": 0 }
+            }
+          }
+        }
+      }
+    },
+
+    "attribution": {
+      "type": "object",
+      "description": "Deterministic driver decomposition supplied to the model as its only permitted causal evidence.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "metric_key": { "type": "string" },
+          "total_change": { "type": "number" },
+          "unit": { "type": "string" },
+          "explained_share_pct": { "type": "number" },
+          "sufficient": { "type": "boolean" },
+          "contributors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string" },
+                "current": { "type": "number" },
+                "prior": { "type": "number" },
+                "change": { "type": "number" },
+                "share_of_change_pct": { "type": "number" },
+                "stock_effect": { "type": ["number", "null"] },
+                "denominator_effect": { "type": ["number", "null"] }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "reconciliations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": { "type": "string" },
+          "label": { "type": "string" },
+          "bottom_up_value": { "type": "number" },
+          "reported_value": { "type": "number" },
+          "variance": { "type": "number" },
+          "variance_pct": { "type": "number" },
+          "tolerance_pct": { "type": "number" },
+          "breached": { "type": "boolean" }
+        }
+      }
+    },
+
+    "validation_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "rule": { "type": "string" },
+          "severity": { "type": "string" },
+          "observed": { "type": "string" },
+          "status": { "type": "string", "enum": ["PASS", "FAIL", "NOT_EVALUABLE"] }
+        }
+      }
+    },
+
+    "one_off_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "item_id": { "type": "string" },
+          "description": { "type": "string" },
+          "metric_affected": { "type": "string" },
+          "impact_value": { "type": "number" },
+          "impact_unit": { "type": "string" },
+          "nature": { "type": "string" },
+          "recurring": { "type": "string" },
+          "disclosure_note": { "type": "string" }
+        }
+      }
+    },
+
+    "derived_metrics": {
+      "type": "object",
+      "description": "Figures computed from the feeds and quoted in commentary but not rendered as comparison-table rows.",
+      "additionalProperties": { "type": ["number", "string", "null"] }
+    },
+
+    "review_queue": {
+      "type": "array",
+      "description": "Everything routed to the finance team before CFO sign-off.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "origin": { "type": "string", "enum": ["guardrail", "reconciliation", "validation", "attribution", "arithmetic_audit"] },
+          "section_id": { "type": ["string", "null"] },
+          "field": { "type": ["string", "null"] },
+          "issue_type": { "type": "string" },
+          "severity": { "type": "string" },
+          "recommended_action": { "type": "string" }
+        }
+      }
+    },
+
+    "guardrail_report": {
+      "type": "object",
+      "properties": {
+        "sections_drafted": { "type": "integer" },
+        "sections_clean": { "type": "integer" },
+        "sections_flagged": { "type": "integer" },
+        "total_flags": { "type": "integer" },
+        "flags_by_type": { "type": "object", "additionalProperties": { "type": "integer" } },
+        "repair_rounds_used": { "type": "integer" },
+        "figures_checked": { "type": "integer" },
+        "ungrounded_figures": { "type": "integer" }
+      }
+    },
+
+    "arithmetic_audit": {
+      "type": "array",
+      "description": "Independent recompute of every displayed figure. Empty means clean.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "metric": { "type": "string" },
+          "expected": { "type": ["number", "string"] },
+          "reported": { "type": ["number", "string", "null"] },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "time_saved": {
+      "type": "object",
+      "properties": {
+        "manual_minutes": { "type": "number" },
+        "assisted_minutes": { "type": "number" },
+        "minutes_saved": { "type": "number" },
+        "hours_saved": { "type": "number" },
+        "basis": { "type": "string" }
+      }
+    },
+
+    "llm_metadata": {
+      "type": "object",
+      "properties": {
+        "provider": { "type": "string" },
+        "model": { "type": "string" },
+        "passes": { "type": "integer" },
+        "repair_rounds": { "type": "integer" },
+        "latency_s": { "type": "number" },
+        "degraded": { "type": "boolean" },
+        "reason": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "company_name": "Meridian Capital Finance Limited",
+  "platform": "Atlas Hub - NBFC Enterprise Suite",
+  "module": "Investor Reporting",
+  "entity_type": "NBFC-ICC (Middle Layer)",
+  "regulator": "Reserve Bank of India",
+  "accounting_standard": "Ind AS",
+  "ecl_standard": "Ind AS 109",
+  "listing_status": "Unlisted - privately held with institutional investors",
+  "reporting_currency": "INR",
+  "currency_symbol": "₹",
+  "reporting_unit": "Crore",
+  "confidentiality": "Strictly Confidential - For Investor and Board Circulation Only",
+  "deck_owner": "Chief Financial Officer",
+  "prepared_by": "Finance - Investor Reporting",
+  "board_meeting_date": "2026-08-21",
+  "investor_update_date": "2026-08-14",
+  "regulatory_minimum_crar_pct": 15.0,
+  "board_approved_leverage_ceiling": 4.0,
+  "effective_tax_rate": 0.252
+}

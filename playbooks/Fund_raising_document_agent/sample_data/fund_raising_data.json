@@ -1,0 +1,129 @@
+{
+  "company_metadata": {
+    "company_name": "ABC FINANCE LIMITED",
+    "business_type": "NBFC - Financial Services",
+    "active_package": "Investor Data Pack - NCD Issuance (ABC FINANCE LIMITED)",
+    "period": "Q1 FY2026-27",
+    "accounting_standard": "Ind AS",
+    "confidentiality": "CONFIDENTIAL"
+  },
+  "financial_metrics": {
+    "revenue_cr": 425.0,
+    "revenue_yoy_pct": 11.2,
+    "ebitda_cr": 82.0,
+    "ebitda_yoy_pct": 14.8,
+    "pat_cr": 48.0,
+    "pat_yoy_pct": 9.4,
+    "total_debt_cr": 680.0,
+    "total_debt_yoy_pct": 8.1,
+    "total_debt_qoq_pct": 8.1,
+    "net_worth_cr": 325.0,
+    "net_worth_yoy_pct": 7.5
+  },
+  "portfolio_metrics": {
+    "aum_cr": 1250.0,
+    "aum_qoq_pct": 12.3,
+    "disbursement_cr": 285.0,
+    "collection_cr": 240.0,
+    "gnpa_pct": 1.80,
+    "gnpa_previous_pct": 2.00,
+    "nnpa_pct": 0.92,
+    "collection_efficiency_pct": 96.4,
+    "active_loans": 82450
+  },
+  "key_ratios": {
+    "dscr": 1.42,
+    "dscr_threshold": 1.25,
+    "debt_to_equity": 2.10,
+    "debt_to_equity_previous": 1.92,
+    "interest_coverage": 2.80,
+    "capital_adequacy_pct": 18.6,
+    "capital_adequacy_min_pct": 15.0,
+    "roa_pct": 2.35,
+    "roe_pct": 15.2
+  },
+  "operational_kpis": {
+    "data_sources_connected": 8,
+    "data_sources_status": "All Active",
+    "sections_completed": 12,
+    "sections_total": 12,
+    "completion_pct": 100.0,
+    "validation_checks_passed": 42,
+    "validation_checks_total": 42,
+    "items_needing_review": 3,
+    "pack_status": "Ready for Review",
+    "est_time_saved_hours": 12.6,
+    "baseline_manual_hours": 13.0,
+    "agent_processing_minutes": 24.0
+  },
+  "historical_10_quarters": [
+    {"period": "Q1 FY24", "revenue_cr": 310.0, "ebitda_cr": 60.0, "pat_cr": 32.0, "total_debt_cr": 520.0, "net_worth_cr": 240.0, "aum_cr": 850.0, "gnpa_pct": 2.40, "nnpa_pct": 1.25, "dscr": 1.31, "debt_to_equity": 2.17},
+    {"period": "Q2 FY24", "revenue_cr": 325.0, "ebitda_cr": 63.0, "pat_cr": 34.0, "total_debt_cr": 540.0, "net_worth_cr": 250.0, "aum_cr": 890.0, "gnpa_pct": 2.35, "nnpa_pct": 1.20, "dscr": 1.33, "debt_to_equity": 2.16},
+    {"period": "Q3 FY24", "revenue_cr": 340.0, "ebitda_cr": 66.0, "pat_cr": 36.0, "total_debt_cr": 560.0, "net_worth_cr": 260.0, "aum_cr": 940.0, "gnpa_pct": 2.25, "nnpa_pct": 1.15, "dscr": 1.35, "debt_to_equity": 2.15},
+    {"period": "Q4 FY24", "revenue_cr": 355.0, "ebitda_cr": 69.0, "pat_cr": 38.0, "total_debt_cr": 580.0, "net_worth_cr": 272.0, "aum_cr": 990.0, "gnpa_pct": 2.18, "nnpa_pct": 1.10, "dscr": 1.37, "debt_to_equity": 2.13},
+    {"period": "Q1 FY25", "revenue_cr": 370.0, "ebitda_cr": 72.0, "pat_cr": 40.0, "total_debt_cr": 600.0, "net_worth_cr": 285.0, "aum_cr": 1050.0, "gnpa_pct": 2.10, "nnpa_pct": 1.05, "dscr": 1.38, "debt_to_equity": 2.11},
+    {"period": "Q2 FY25", "revenue_cr": 385.0, "ebitda_cr": 75.0, "pat_cr": 42.0, "total_debt_cr": 620.0, "net_worth_cr": 295.0, "aum_cr": 1100.0, "gnpa_pct": 2.05, "nnpa_pct": 1.00, "dscr": 1.39, "debt_to_equity": 2.10},
+    {"period": "Q3 FY25", "revenue_cr": 400.0, "ebitda_cr": 78.0, "pat_cr": 44.0, "total_debt_cr": 640.0, "net_worth_cr": 305.0, "aum_cr": 1150.0, "gnpa_pct": 2.00, "nnpa_pct": 0.98, "dscr": 1.40, "debt_to_equity": 2.10},
+    {"period": "Q4 FY25", "revenue_cr": 412.0, "ebitda_cr": 80.0, "pat_cr": 46.0, "total_debt_cr": 660.0, "net_worth_cr": 315.0, "aum_cr": 1200.0, "gnpa_pct": 1.90, "nnpa_pct": 0.95, "dscr": 1.41, "debt_to_equity": 2.09},
+    {"period": "Q1 FY26", "revenue_cr": 425.0, "ebitda_cr": 82.0, "pat_cr": 48.0, "total_debt_cr": 680.0, "net_worth_cr": 325.0, "aum_cr": 1250.0, "gnpa_pct": 1.80, "nnpa_pct": 0.92, "dscr": 1.42, "debt_to_equity": 2.10},
+    {"period": "Q2 FY26", "revenue_cr": 440.0, "ebitda_cr": 86.0, "pat_cr": 51.0, "total_debt_cr": 705.0, "net_worth_cr": 338.0, "aum_cr": 1310.0, "gnpa_pct": 1.75, "nnpa_pct": 0.88, "dscr": 1.44, "debt_to_equity": 2.09}
+  ],
+  "borrowing_facilities_10_tranches": [
+    {"facility_id": "FAC-001", "lender_name": "State Bank of India", "facility_type": "Rupee Term Loan", "sanctioned_amount_cr": 150.0, "outstanding_balance_cr": 135.0, "interest_rate_pct": 8.75, "status": "Active"},
+    {"facility_id": "FAC-002", "lender_name": "HDFC Bank", "facility_type": "Rupee Term Loan", "sanctioned_amount_cr": 120.0, "outstanding_balance_cr": 108.0, "interest_rate_pct": 8.60, "status": "Active"},
+    {"facility_id": "FAC-003", "lender_name": "Axis Bank", "facility_type": "Term Loan Facility", "sanctioned_amount_cr": 100.0, "outstanding_balance_cr": 90.0, "interest_rate_pct": 8.80, "status": "Active"},
+    {"facility_id": "FAC-004", "lender_name": "CRISIL Rated NCD Series I", "facility_type": "Non-Convertible Debenture", "sanctioned_amount_cr": 80.0, "outstanding_balance_cr": 80.0, "interest_rate_pct": 9.15, "status": "Active"},
+    {"facility_id": "FAC-005", "lender_name": "ICRA Rated NCD Series II", "facility_type": "Non-Convertible Debenture", "sanctioned_amount_cr": 75.0, "outstanding_balance_cr": 75.0, "interest_rate_pct": 9.25, "status": "Active"},
+    {"facility_id": "FAC-006", "lender_name": "NABARD Refinance Facility", "facility_type": "Refinance Line", "sanctioned_amount_cr": 60.0, "outstanding_balance_cr": 52.0, "interest_rate_pct": 7.90, "status": "Active"},
+    {"facility_id": "FAC-007", "lender_name": "Bank of Baroda", "facility_type": "Cash Credit / OD Line", "sanctioned_amount_cr": 50.0, "outstanding_balance_cr": 45.0, "interest_rate_pct": 8.95, "status": "Under Renewal"},
+    {"facility_id": "FAC-008", "lender_name": "ICICI Bank", "facility_type": "Rupee Term Loan", "sanctioned_amount_cr": 45.0, "outstanding_balance_cr": 40.0, "interest_rate_pct": 8.70, "status": "Active"},
+    {"facility_id": "FAC-009", "lender_name": "SIDBI MSME Credit Line", "facility_type": "Special Refinance", "sanctioned_amount_cr": 35.0, "outstanding_balance_cr": 30.0, "interest_rate_pct": 7.75, "status": "Active"},
+    {"facility_id": "FAC-010", "lender_name": "Union Bank Commercial Paper", "facility_type": "Commercial Paper", "sanctioned_amount_cr": 25.0, "outstanding_balance_cr": 25.0, "interest_rate_pct": 8.40, "status": "Active"}
+  ],
+  "portfolio_segments_10_products": [
+    {"segment_id": "SEG-001", "product_category": "MSME Secured Loans", "aum_cr": 380.0, "active_accounts": 22100, "gnpa_90_plus_dpd_cr": 1.5, "collection_efficiency_pct": 97.2},
+    {"segment_id": "SEG-002", "product_category": "Loan Against Property (LAP)", "aum_cr": 290.0, "active_accounts": 14500, "gnpa_90_plus_dpd_cr": 0.9, "collection_efficiency_pct": 97.8},
+    {"segment_id": "SEG-003", "product_category": "Small Business Loans", "aum_cr": 180.0, "active_accounts": 16200, "gnpa_90_plus_dpd_cr": 1.2, "collection_efficiency_pct": 95.8},
+    {"segment_id": "SEG-004", "product_category": "Personal Loans", "aum_cr": 120.0, "active_accounts": 12800, "gnpa_90_plus_dpd_cr": 1.1, "collection_efficiency_pct": 94.5},
+    {"segment_id": "SEG-005", "product_category": "Microfinance Loans", "aum_cr": 95.0, "active_accounts": 9800, "gnpa_90_plus_dpd_cr": 0.8, "collection_efficiency_pct": 95.1},
+    {"segment_id": "SEG-006", "product_category": "Two-Wheeler Loans", "aum_cr": 65.0, "active_accounts": 4200, "gnpa_90_plus_dpd_cr": 0.5, "collection_efficiency_pct": 96.0},
+    {"segment_id": "SEG-007", "product_category": "Vehicle & Auto Loans", "aum_cr": 45.0, "active_accounts": 1650, "gnpa_90_plus_dpd_cr": 0.3, "collection_efficiency_pct": 96.5},
+    {"segment_id": "SEG-008", "product_category": "Agri-Business Credit", "aum_cr": 35.0, "active_accounts": 850, "gnpa_90_plus_dpd_cr": 0.3, "collection_efficiency_pct": 94.8},
+    {"segment_id": "SEG-009", "product_category": "Supply Chain Finance", "aum_cr": 25.0, "active_accounts": 230, "gnpa_90_plus_dpd_cr": 0.1, "collection_efficiency_pct": 98.2},
+    {"segment_id": "SEG-010", "product_category": "Commercial Vehicle Loans", "aum_cr": 15.0, "active_accounts": 120, "gnpa_90_plus_dpd_cr": 0.1, "collection_efficiency_pct": 97.5}
+  ],
+  "review_items": [
+    {
+      "id": 1,
+      "field_name": "Cost of Borrowing",
+      "issue_type": "Missing",
+      "recommended_action": "Provide detailed bank tranche breakdown"
+    },
+    {
+      "id": 2,
+      "field_name": "Rating",
+      "issue_type": "Outdated",
+      "recommended_action": "Update latest ICRA/CRISIL rating letter"
+    },
+    {
+      "id": 3,
+      "field_name": "Promoter Holding",
+      "issue_type": "Conflict",
+      "recommended_action": "Two source data differ"
+    }
+  ],
+  "ai_insights": [
+    "AUM increased 12.3% compared with previous quarter.",
+    "Total debt increased 8.1% QoQ.",
+    "GNPA improved from 2.0% to 1.80%.",
+    "Debt/Equity increased from 1.92x to 2.10x.",
+    "DSCR remains above the threshold (1.42x)."
+  ],
+  "recent_agent_activity": [
+    {"time": "12:15 AM", "event": "Data pack generation completed", "status": "success"},
+    {"time": "12:12 AM", "event": "Validation checks completed (42/42 Passed)", "status": "success"},
+    {"time": "12:08 AM", "event": "Ratios calculated", "status": "success"},
+    {"time": "12:03 AM", "event": "Data standardization completed", "status": "success"},
+    {"time": "11:58 PM", "event": "Data retrieval from 8 sources completed", "status": "success"}
+  ]
+}

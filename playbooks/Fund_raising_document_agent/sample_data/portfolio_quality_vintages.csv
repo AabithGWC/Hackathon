@@ -1,0 +1,11 @@
+segment_id,product_category,aum_cr,active_accounts,current_0_dpd_cr,bucket_1_30_dpd_cr,bucket_31_60_dpd_cr,bucket_61_90_dpd_cr,gnpa_90_plus_dpd_cr,provision_amount_cr,collection_efficiency_pct
+SEG-001,MSME Secured Loans,380.0,22100,366.7,6.8,3.5,1.5,1.5,0.80,97.2
+SEG-002,Loan Against Property (LAP),290.0,14500,281.3,4.6,2.3,0.9,0.9,0.50,97.8
+SEG-003,Small Business Loans,180.0,16200,171.9,4.1,2.0,0.8,1.2,0.65,95.8
+SEG-004,Personal Loans,120.0,12800,112.8,3.6,1.8,0.7,1.1,0.60,94.5
+SEG-005,Microfinance Loans,95.0,9800,90.2,2.4,1.1,0.5,0.8,0.45,95.1
+SEG-006,Two-Wheeler Loans,65.0,4200,61.7,1.8,0.7,0.3,0.5,0.28,96.0
+SEG-007,Vehicle & Auto Loans,45.0,1650,43.2,0.9,0.4,0.2,0.3,0.18,96.5
+SEG-008,Agri-Business Credit,35.0,850,33.2,0.9,0.4,0.2,0.3,0.15,94.8
+SEG-009,Supply Chain Finance,25.0,230,24.4,0.3,0.1,0.1,0.1,0.06,98.2
+SEG-010,Commercial Vehicle Loans,15.0,120,14.6,0.2,0.1,0.0,0.1,0.05,97.5

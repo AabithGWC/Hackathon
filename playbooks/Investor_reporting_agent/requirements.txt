@@ -1,0 +1,16 @@
+# ==============================================================================
+# INVESTOR / BOARD REPORTING AGENT - PYTHON DEPENDENCIES
+# ==============================================================================
+
+# Core data & configuration
+pandas>=2.0.0
+pyyaml>=6.0
+jsonschema>=4.17.0
+
+# PDF generation
+reportlab>=4.0.0
+
+# LLM provider SDKs - groq is the default; the others are optional alternates
+groq>=0.4.0
+openai>=1.0.0
+google-generativeai>=0.3.0

@@ -1,0 +1,64 @@
+# ==============================================================================
+# INVESTOR / BOARD REPORTING AGENT
+# ==============================================================================
+
+# ---- Secrets -----------------------------------------------------------------
+# .env holds the live Groq API key. It must never be committed.
+# .env.example is the template that IS committed - keep it placeholder-only.
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+credentials.json
+secrets.yaml
+
+# ---- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ---- Virtual environments ----------------------------------------------------
+venv/
+.venv/
+env/
+ENV/
+.python-version
+
+# ---- Generated outputs -------------------------------------------------------
+# Everything in output/ is regenerated on every run from the feeds in
+# sample_data/. Committing it means the repo carries figures from whenever
+# someone last ran the agent, which then get mistaken for current. The directory
+# itself is kept so a fresh clone has somewhere to write.
+output/*
+!output/.gitkeep
+investor_report_reviewed.json
+test_*
+
+# ---- Tooling / IDE -----------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- OS ----------------------------------------------------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+$RECYCLE.BIN/
+
+# ---- Office lock files -------------------------------------------------------
+~$*.docx
+~$*.xlsx
+~$*.pptx

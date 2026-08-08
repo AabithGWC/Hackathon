@@ -1,0 +1,801 @@
+# ==============================================================================
+# INVESTOR / BOARD REPORTING AGENT - TECHNICAL PLAYBOOK CONFIGURATION
+# ==============================================================================
+# Playbook Name: investor_board_commentary_drafting
+# Frontend      : Atlas Hub - NBFC Enterprise Suite > Finance & Treasury >
+#                 Investor Reporting
+#
+# This file holds every TECHNICAL aspect of the agent: which data feeds exist,
+# what each KPI means and how it is computed, which comparators are used, how
+# driver attribution is decomposed, what the materiality thresholds are, what
+# the guardrails forbid, and which validation rules must be evaluated.
+#
+# It is also the CONTRACT WITH THE FRONTEND. Every block below maps to a named
+# panel on the Investor Reporting screen, and the key names here are the key
+# names emitted in generated_investor_report.json:
+#
+#   kpi_catalog          -> "Quarter-over-quarter comparison" table
+#   budget_variance      -> "Variance to budget" strip
+#   stage_movement       -> "Stage movement" card
+#   risk_rules           -> "Risk / attention items" card
+#   source_traceability  -> "Source traceability" card
+#   report_readiness     -> "Report readiness" donut and counters
+#   commentary_sections  -> "AI-generated commentary" editable cards
+#   tone_presets         -> the "Tone:" dropdown
+#
+# The narrative INSTRUCTIONS (persona, tone, structure, what to write) live in
+# the Markdown files - system_prompt.md, drafting_prompt.md, style_guide.md.
+# Nothing in this file tells the model how to write; nothing in those files
+# tells it how to calculate.
+# ==============================================================================
+
+playbook_name: investor_board_commentary_drafting
+schema_version: "2.0"
+frontend_module: atlas_hub.investor_reporting
+description: >
+  Technical specification used by the Investor/Board Reporting Agent to compute
+  the headline quarterly KPIs shown on the Atlas Hub Investor Reporting screen,
+  decompose their movement into segment-level drivers, raise risk / attention
+  items, and draft the editable commentary cards that the finance team refines
+  and the CFO approves.
+
+# ------------------------------------------------------------------------------
+# 1. INPUT DATA FEEDS  (Section 5 of the system design note)
+# ------------------------------------------------------------------------------
+inputs:
+  # 5.2 Historical quarterly data & key metrics - one row per quarter, oldest
+  # first. The LAST row is the current reporting quarter (5.1).
+  quarterly_metrics: sample_data/quarterly_metrics.csv
+
+  # 5.1 Segment breakdown for the current quarter, with prior-quarter and
+  # prior-year comparatives on the same row so movement is attributable.
+  segment_breakdown: sample_data/segment_breakdown.csv
+
+  # 5.1 Exceptional / non-recurring items finance wants explicitly called out.
+  one_off_items: sample_data/one_off_items.csv
+
+  # Feeds the FORECAST column of the comparison table. These are approved plan
+  # figures supplied by the business - the agent never invents a projection.
+  forecast_plan: sample_data/forecast_plan.csv
+
+  # Feeds the "Variance to budget" strip.
+  budget_targets: sample_data/budget_targets.csv
+
+  # 5.3 Past investor/board deck commentary - the tone/style/structure reference.
+  past_commentary: sample_data/past_deck_commentary.json
+
+  company_profile: sample_data/company_profile.json
+
+# ------------------------------------------------------------------------------
+# 2. REPORTING PERIOD RESOLUTION
+# ------------------------------------------------------------------------------
+# Row offsets are negative indices into the quarterly_metrics table (oldest
+# first), so -1 is always the current quarter regardless of how many quarters of
+# history the data team supplies.
+reporting:
+  current_row_offset: -1
+  qoq_row_offset: -2          # immediately preceding quarter -> PRIOR ACTUAL
+  yoy_row_offset: -5          # same quarter one fiscal year earlier
+  forecast_quarter: "Q2 FY27" # which row of forecast_plan feeds the FORECAST column
+  fiscal_year_start_month: 4  # April - Indian fiscal year
+  currency_unit: "INR Crore"
+  currency_symbol: "₹"
+  effective_tax_rate: 0.252
+  audiences: [investor, board]
+
+# ------------------------------------------------------------------------------
+# 3. KPI CATALOG  ->  "Quarter-over-quarter comparison" table
+# ------------------------------------------------------------------------------
+# Row order here IS the row order rendered on screen.
+#
+#   change_type   pct_change  - variance expressed as a % change  (+12.3%)
+#                 pp_change   - variance expressed in percentage points (-0.20%)
+#                 The frontend prints a % sign either way; the distinction
+#                 matters because a ratio must never be described as having
+#                 moved "12 percent" when it moved 12 basis points.
+#   direction     higher_is_better | lower_is_better | neutral
+#                 Decides the favourable/adverse sentiment and the red/green
+#                 treatment. The model is NOT permitted to decide this itself.
+#   materiality   movement below this (in the metric's own change unit) is noise:
+#                 report the level, do not narrate the change, never attribute a
+#                 driver to it.
+#   source_system feeds the "Source traceability" card.
+kpi_catalog:
+
+  aum_cr:
+    label: "AUM (₹ Cr)"
+    short_label: "AUM"
+    unit: "INR Crore"
+    column: aum_cr
+    definition: "Total outstanding loan book across all product segments, gross of provisions, at quarter end."
+    change_type: pct_change
+    direction: higher_is_better
+    materiality: 1.0
+    precision: 0
+    display_format: "{value:,.0f}"
+    source_system: portfolio_mis
+    order: 1
+
+  disbursement_cr:
+    label: "Disbursements (₹ Cr)"
+    short_label: "Disbursements"
+    unit: "INR Crore"
+    column: disbursement_cr
+    definition: "Gross loan amount originated and disbursed during the quarter. A flow measure, never cumulative."
+    change_type: pct_change
+    direction: higher_is_better
+    materiality: 1.0
+    precision: 0
+    display_format: "{value:,.0f}"
+    source_system: portfolio_mis
+    order: 2
+
+  revenue_cr:
+    label: "Revenue (₹ Cr)"
+    short_label: "Revenue"
+    unit: "INR Crore"
+    column: revenue_cr
+    definition: "Total income for the quarter, comprising interest income on advances, fee income and other operating income."
+    change_type: pct_change
+    direction: higher_is_better
+    materiality: 1.0
+    precision: 0
+    display_format: "{value:,.0f}"
+    source_system: gl_erp
+    order: 3
+
+  ebitda_cr:
+    label: "EBITDA (₹ Cr)"
+    short_label: "EBITDA"
+    unit: "INR Crore"
+    column: ebitda_cr
+    definition: "Earnings before interest, tax, depreciation and amortisation for the quarter."
+    change_type: pct_change
+    direction: higher_is_better
+    materiality: 1.0
+    precision: 0
+    display_format: "{value:,.0f}"
+    source_system: gl_erp
+    order: 4
+
+  pat_cr:
+    label: "PAT (₹ Cr)"
+    short_label: "PAT"
+    unit: "INR Crore"
+    column: pat_cr
+    definition: "Net profit for the quarter after all operating expenses, credit costs, interest and tax."
+    change_type: pct_change
+    direction: higher_is_better
+    materiality: 1.0
+    precision: 0
+    display_format: "{value:,.0f}"
+    source_system: gl_erp
+    order: 5
+
+  gnpa_pct:
+    label: "GNPA (%)"
+    short_label: "GNPA"
+    unit: "Percentage"
+    column: gnpa_pct
+    definition: "Loans overdue more than 90 days (Stage 3 assets) divided by gross AUM, expressed as a percentage."
+    change_type: pp_change
+    direction: lower_is_better
+    materiality: 0.05
+    precision: 2
+    display_format: "{value:.2f}%"
+    source_system: ecl_engine
+    order: 6
+
+  nnpa_pct:
+    label: "NNPA (%)"
+    short_label: "NNPA"
+    unit: "Percentage"
+    column: nnpa_pct
+    definition: "Stage 3 assets net of expected credit loss provisions, divided by net AUM, expressed as a percentage."
+    change_type: pp_change
+    direction: lower_is_better
+    materiality: 0.03
+    precision: 2
+    display_format: "{value:.2f}%"
+    source_system: ecl_engine
+    order: 7
+
+  cost_of_funds_pct:
+    label: "Cost of Funds (%)"
+    short_label: "Cost of Funds"
+    unit: "Percentage"
+    column: cost_of_funds_pct
+    definition: "Annualised interest expended on borrowings as a percentage of average outstanding borrowings."
+    change_type: pp_change
+    direction: lower_is_better
+    materiality: 0.03
+    precision: 2
+    display_format: "{value:.2f}%"
+    source_system: treasury_tms
+    order: 8
+
+# ------------------------------------------------------------------------------
+# 4. FORECAST COLUMN
+# ------------------------------------------------------------------------------
+# The FORECAST column carries approved plan figures supplied by the business.
+# The agent NEVER generates a projection of its own: if a plan figure is absent
+# the cell is null and the frontend renders a dash. This is deliberate - a
+# model-invented forecast in an investor deck is a disclosure risk, not a
+# convenience.
+forecast:
+  source: plan_feed
+  allow_model_generated: false
+  allow_trend_extrapolation: false
+  label: "FORECAST"
+  # Commentary may state the plan figure as a plan figure, attributed to its
+  # approver. It may never present a plan figure as an expectation. See the
+  # forward_looking guardrail below.
+  commentary_may_reference: true
+  commentary_must_attribute: true
+
+# ------------------------------------------------------------------------------
+# 5. BUDGET VARIANCE  ->  "Variance to budget" strip
+# ------------------------------------------------------------------------------
+budget_variance:
+  headline_metric: revenue_cr
+  label: "Variance to budget"
+  # Computed as: actual - budget, and (actual - budget) / budget * 100
+  favourable_when: above       # above | below - revenue above budget is favourable
+  display_template: "{symbol}{variance:,.1f} Cr ({pct:+.1f}% vs budget)"
+  # Every KPI with a budget row is also computed and returned, so the frontend
+  # can surface variance per metric if the strip is expanded.
+  compute_for_all_kpis: true
+
+# ------------------------------------------------------------------------------
+# 6. STAGE MOVEMENT  ->  "Stage movement" card
+# ------------------------------------------------------------------------------
+# Ind AS 109 ECL staging. Current from the quarterly feed, forecast from the
+# approved ECL migration model in forecast_plan.
+stage_movement:
+  title: "Stage movement"
+  subtitle: "Portfolio migration & net flow"
+  empty_message: "No records found"
+  stages:
+    - key: stage1_cr
+      label: "Stage 1"
+      description: "Performing - 0 to 30 days past due, 12-month ECL"
+    - key: stage2_cr
+      label: "Stage 2"
+      description: "Significant increase in credit risk - 31 to 90 days past due, lifetime ECL"
+    - key: stage3_cr
+      label: "Stage 3"
+      description: "Credit impaired - 90+ days past due, lifetime ECL"
+  net_flow_metric:
+    key: net_flow_to_stage3_cr
+    label: "Net new flow to stage 3"
+    direction: lower_is_better
+    display_format: "{symbol}{value:.1f} Cr"
+  # Percentage-of-book is computed alongside each stage so the card can show mix.
+  show_share_of_book: true
+
+# ------------------------------------------------------------------------------
+# 7. RISK / ATTENTION RULES  ->  "Risk / attention items" card
+# ------------------------------------------------------------------------------
+# Items are DERIVED from the data by the rules below, not authored by the model.
+# The model may describe them; it may not invent one and may not suppress one.
+# Each rule that triggers produces one card entry, ranked by severity then by
+# magnitude.
+risk_rules:
+
+  - id: RSK-STAGE2-MIGRATION
+    label: "Segment Stage 2 migration"
+    basis: segment
+    metric: stage2_cr
+    prior_metric: stage2_prior_qtr_cr
+    condition: absolute_increase_above
+    threshold: 20.0
+    severity: High
+    category: "Asset quality"
+    message_template: "{segment} segment stage 2 migration increased by {symbol}{delta:.0f} Cr"
+
+  - id: RSK-STAGE3-EXPANSION
+    label: "Segment 90+ DPD expansion"
+    basis: segment
+    metric: gnpa_cr
+    prior_metric: gnpa_prior_qtr_cr
+    condition: pct_increase_above
+    threshold: 10.0
+    severity: High
+    category: "Asset quality"
+    message_template: "90+ DPD accounts expanded {pct:.0f}% QoQ in the {segment} book"
+
+  - id: RSK-COF-INCREASE
+    label: "Cost of funds increase"
+    basis: kpi
+    metric: cost_of_funds_pct
+    condition: pp_increase_above
+    threshold: 0.10
+    severity: Medium
+    category: "Funding"
+    message_template: "Cost of funds increased by {bps:.0f} bps following the change in the policy rate"
+
+  - id: RSK-NET-FLOW-STAGE3
+    label: "Net new flow to Stage 3"
+    basis: kpi
+    metric: net_flow_to_stage3_cr
+    condition: pct_increase_above
+    threshold: 15.0
+    severity: Medium
+    category: "Asset quality"
+    message_template: "Net new flow to stage 3 rose to {symbol}{value:.1f} Cr from {symbol}{prior:.1f} Cr"
+
+  - id: RSK-CONCENTRATION
+    label: "Growth concentration"
+    basis: segment
+    metric: aum_cr
+    prior_metric: aum_prior_qtr_cr
+    condition: share_of_movement_above
+    threshold: 30.0
+    severity: Low
+    category: "Portfolio mix"
+    message_template: "{segment} contributed {pct:.0f}% of the quarter's AUM growth"
+
+  - id: RSK-RECONCILIATION
+    label: "Cross-source variance"
+    basis: reconciliation
+    condition: breached
+    severity: High
+    category: "Data integrity"
+    message_template: "{field}: segment ledger reports {bottom_up} against {reported} from the reporting system, a variance of {variance_pct:.1f}%"
+
+  - id: RSK-UNEXPLAINED
+    label: "Unattributed movement"
+    basis: attribution
+    condition: explained_share_below
+    threshold: 60.0
+    severity: Medium
+    category: "Explainability"
+    message_template: "{metric_label} moved {change} but named drivers explain only {explained_pct:.0f}% of the movement"
+
+  - id: RSK-VALIDATION-FAIL
+    label: "Validation breach"
+    basis: validation
+    condition: failed
+    severity: High
+    category: "Compliance"
+    message_template: "{name}: {observed}"
+
+risk_display:
+  title: "Risk / attention items"
+  max_visible: 3            # the card shows 3 and offers "View all"
+  severity_order: [High, Medium, Low]
+
+# ------------------------------------------------------------------------------
+# 8. SOURCE TRACEABILITY  ->  "Source traceability" card
+# ------------------------------------------------------------------------------
+# Each entry declares which system of record the KPIs came from. The agent marks
+# an entry verified only when every KPI mapped to it was computed successfully
+# from the feed and passed reconciliation.
+source_traceability:
+  - id: portfolio_mis
+    label: "AUM & Disbursements"
+    system: "Portfolio MIS (Core Banking)"
+    metrics: [aum_cr, disbursement_cr]
+    feed: quarterly_metrics
+  - id: gl_erp
+    label: "Revenue & EBITDA"
+    system: "SAP General Ledger ERP"
+    metrics: [revenue_cr, ebitda_cr, pat_cr]
+    feed: quarterly_metrics
+  - id: ecl_engine
+    label: "NPA & Stage Movement"
+    system: "ECL Engine (Ind AS 109)"
+    metrics: [gnpa_pct, nnpa_pct, stage1_cr, stage2_cr, stage3_cr]
+    feed: quarterly_metrics
+  - id: treasury_tms
+    label: "Cost of Funds"
+    system: "Treasury Management System"
+    metrics: [cost_of_funds_pct]
+    feed: quarterly_metrics
+
+# ------------------------------------------------------------------------------
+# 9. REPORT READINESS  ->  "Report readiness" donut
+# ------------------------------------------------------------------------------
+# The donut is a weighted completion score out of `total`. The agent sets the
+# machine-owned counters on generation; the human-owned counters start at zero
+# and are advanced by the frontend as the finance team works through the screen.
+report_readiness:
+  title: "Report readiness"
+  total: 100
+  counters:
+    - key: metrics_completed
+      label: "Metrics completed"
+      weight: 25
+      owner: agent            # complete when every KPI computed and reconciled
+    - key: commentary_accepted
+      label: "Commentary accepted"
+      weight: 40
+      owner: human            # finance team accepts each commentary card
+    - key: risk_items_reviewed
+      label: "Risk items reviewed"
+      weight: 20
+      owner: human
+    - key: slide_previewed
+      label: "Slide previewed"
+      weight: 15
+      owner: human
+  legend:
+    completed: "Completed"
+    pending: "Pending"
+
+# ------------------------------------------------------------------------------
+# 10. COMMENTARY SECTIONS  ->  "AI-generated commentary" editable cards
+# ------------------------------------------------------------------------------
+# Card order here IS the card order rendered on screen. `delta_badge` defines the
+# pill shown next to the card title. `beats` are the points the commentary must
+# land - the model chooses the words, never the skeleton.
+commentary_sections:
+
+  - id: aum_growth
+    title: "AUM & Growth Overview"
+    order: 1
+    audiences: [investor, board]
+    kpis: [aum_cr, disbursement_cr]
+    delta_badge:
+      metric: aum_cr
+      basis: qoq_absolute
+      format: "{sign}{symbol}{value:.0f} Cr QoQ"
+      direction: higher_is_better
+    target_words: 65
+    beats:
+      - "AUM level and its QoQ and YoY movement, both quantified."
+      - "Disbursement momentum for the quarter."
+      - "Which segments drove the movement, taken from the attribution evidence."
+      - "Organic growth separated from any inorganic addition disclosed in one-off items."
+
+  - id: asset_quality
+    title: "Asset Quality & Provisioning"
+    order: 2
+    audiences: [investor, board]
+    kpis: [gnpa_pct, nnpa_pct]
+    delta_badge:
+      metric: gnpa_pct
+      basis: qoq_pp
+      format: "{sign}{value:.2f}% GNPA"
+      direction: lower_is_better
+    target_words: 70
+    beats:
+      - "GNPA and NNPA levels and their movement against both comparators."
+      - "Stage 2 and Stage 3 movement, including net new flow into Stage 3."
+      - "Where stress is concentrated by segment, from the attribution evidence."
+      - "Provision coverage and any variance between reporting systems."
+
+  - id: profitability
+    title: "Profitability & Margins"
+    order: 3
+    audiences: [investor, board]
+    kpis: [revenue_cr, ebitda_cr, pat_cr]
+    delta_badge:
+      metric: pat_cr
+      basis: qoq_pct
+      format: "{sign}{value:.1f}% PAT"
+      direction: higher_is_better
+    target_words: 70
+    beats:
+      - "Revenue, EBITDA and PAT levels with their QoQ and YoY movement."
+      - "Any exceptional item separated out, with the ex-one-off figure stated."
+      - "Margin direction and performance against budget."
+
+  - id: funding_cost
+    title: "Funding & Cost of Funds"
+    order: 4
+    audiences: [investor, board]
+    kpis: [cost_of_funds_pct]
+    delta_badge:
+      metric: cost_of_funds_pct
+      basis: qoq_bps
+      format: "{sign}{value:.0f} bps CoF"
+      direction: lower_is_better
+    target_words: 55
+    beats:
+      - "Cost of funds level and movement, stated in basis points."
+      - "Borrowings and leverage position at quarter end."
+      - "What the movement is attributable to, from the data supplied."
+
+  - id: executive_summary
+    title: "Executive Summary"
+    order: 5
+    audiences: [investor, board]
+    kpis: [aum_cr, pat_cr, gnpa_pct, cost_of_funds_pct]
+    # The summary draws on the sections above it, which already separate the
+    # exceptional items. Forcing every adjusted figure into it as well would
+    # crowd out the one job the summary has.
+    enforce_one_off_separation: false
+    delta_badge:
+      metric: aum_cr
+      basis: qoq_pct
+      format: "{sign}{value:.1f}% AUM QoQ"
+      direction: higher_is_better
+    target_words: 80
+    beats:
+      - "Scale and direction of the quarter in one opening sentence."
+      - "Growth, asset quality and profitability, each in a clause, with figures."
+      - "The single most important movement of the quarter and its driver."
+      - "Any item requiring board attention, named without elaboration."
+
+# ------------------------------------------------------------------------------
+# 11. TONE PRESETS  ->  the "Tone:" dropdown
+# ------------------------------------------------------------------------------
+tone_presets:
+  default: board_formal
+  options:
+    - id: board_formal
+      label: "Board Formal"
+      guidance: "Measured and impersonal. Third person, past tense, short declarative sentences. Figures inline. No adjectives doing work a number should do."
+    - id: investor_narrative
+      label: "Investor Narrative"
+      guidance: "Connected prose that carries the reader through the quarter. Still factual and third person, but transitions between points rather than listing them."
+    - id: analyst_detailed
+      label: "Analyst Detailed"
+      guidance: "Denser and more technical. Includes basis points, mix effects and segment splits that the board version would summarise."
+    - id: concise_summary
+      label: "Concise Summary"
+      guidance: "Maximum brevity. Two or three sentences per section, headline figures only, no elaboration."
+
+# ------------------------------------------------------------------------------
+# 12. DRIVER ATTRIBUTION
+# ------------------------------------------------------------------------------
+# Computed deterministically in Python before the model drafts anything. The
+# model receives the decomposition as evidence and explains it; it never performs
+# the decomposition itself, and it may not assert a driver that does not appear
+# in this evidence.
+attribution:
+  aum_cr:
+    basis: segment
+    value_column: aum_cr
+    prior_column: aum_prior_qtr_cr
+    label_column: segment
+    top_n: 4
+    description: "Contribution of each segment to the QoQ change in AUM."
+
+  gnpa_pct:
+    basis: segment
+    numerator_column: gnpa_cr
+    prior_numerator_column: gnpa_prior_qtr_cr
+    denominator_column: aum_cr
+    prior_denominator_column: aum_prior_qtr_cr
+    label_column: segment
+    top_n: 4
+    description: "Segment contribution to the QoQ change in the GNPA ratio, split into a stock effect (change in Stage 3 balances) and a denominator effect (change in book size)."
+
+  stage2_cr:
+    basis: segment
+    value_column: stage2_cr
+    prior_column: stage2_prior_qtr_cr
+    label_column: segment
+    top_n: 4
+    description: "Contribution of each segment to the QoQ change in Stage 2 exposure."
+
+  # A movement whose named drivers explain less than this share of the total is
+  # unexplained: the agent must flag it rather than guess a cause.
+  min_explained_share_pct: 60.0
+
+# ------------------------------------------------------------------------------
+# 13. GUARDRAILS  (Sections 3 and 6 of the system design note)
+# ------------------------------------------------------------------------------
+guardrails:
+  # Investor/board commentary must not read as forward-looking guidance. Any
+  # sentence containing one of these is held back for CFO attention rather than
+  # silently published. Note that the FORECAST column is plan data and may be
+  # stated as such - see forecast.commentary_must_attribute above.
+  forward_looking_terms:
+    - will
+    - expect
+    - expects
+    - expected
+    - anticipate
+    - anticipates
+    - project
+    - projects
+    - projected
+    - forecast to
+    - guidance
+    - outlook
+    - on track
+    - going forward
+    - next quarter
+    - coming quarters
+    - should improve
+    - likely to
+    - confident
+    - poised
+    - remains robust
+    - sustained demand
+
+  # Unsupported causal certainty. The agent may say a driver is indicated by the
+  # attribution evidence; it may not assert causation the data cannot establish.
+  causal_overreach_terms:
+    - caused by
+    - due to the fact
+    - proves
+    - demonstrates that
+    - clearly shows
+
+  # Promotional language has no place in a board pack.
+  banned_phrases:
+    - "record-breaking"
+    - "best ever"
+    - "stellar"
+    - "phenomenal"
+    - "unprecedented"
+    - "world-class"
+    - "strong momentum"
+    - "robust growth trajectory"
+
+  numeric_grounding:
+    # Every number appearing in drafted prose must reconcile to a computed
+    # figure within this tolerance, else it is treated as ungrounded and the
+    # section is flagged for the finance team.
+    abs_tolerance: 0.051
+    rel_tolerance: 0.01
+    ignore_patterns:
+      - "FY\\d{2}"
+      - "Q[1-4]"
+      - "\\b(19|20)\\d{2}\\b"
+      - "\\b90\\b"            # 90+ DPD is a definition, not a computed figure
+      - "\\bStage [123]\\b"
+      - "\\bInd AS 109\\b"
+
+  unexplained_movement_policy: flag_do_not_guess
+  max_words_per_section: 160
+  # A section tripping any of these is returned to the model once with the
+  # specific violations quoted, before being surfaced with a flag.
+  repair_rounds: 1
+
+# ------------------------------------------------------------------------------
+# 14. VALIDATION RULE CATALOG
+# ------------------------------------------------------------------------------
+# Evaluated arithmetically against the computed figures. Any FAIL becomes a risk
+# / attention item and a review-queue entry - it is never suppressed, and the
+# model is not permitted to overturn a verdict.
+validation_rules:
+  - id: V01
+    name: "Net NPA below Gross NPA"
+    rule: "nnpa_pct < gnpa_pct"
+    severity: High
+  - id: V02
+    name: "GNPA within board-approved risk appetite"
+    rule: "gnpa_pct <= 3.00"
+    severity: High
+  - id: V03
+    name: "Stage 3 balance agrees with reported GNPA"
+    rule: "stage3_cr == gnpa_cr"
+    severity: High
+  - id: V04
+    name: "Stage balances sum to AUM"
+    rule: "stage1_cr + stage2_cr + stage3_cr == aum_cr"
+    severity: High
+  - id: V05
+    name: "EBITDA does not exceed revenue"
+    rule: "ebitda_cr <= revenue_cr"
+    severity: High
+  - id: V06
+    name: "PAT does not exceed EBITDA"
+    rule: "pat_cr <= ebitda_cr"
+    severity: High
+  - id: V07
+    name: "Disbursements within plausible share of AUM"
+    rule: "disbursement_cr <= aum_cr * 0.60"
+    severity: Low
+  - id: V08
+    name: "Cost of funds within ALCO tolerance band"
+    rule: "cost_of_funds_pct <= 9.00"
+    severity: Medium
+  - id: V09
+    name: "Provision coverage above internal floor"
+    rule: "provision_coverage_pct >= 40.00"
+    severity: Medium
+  - id: V10
+    name: "Net flow to Stage 3 within budgeted band"
+    rule: "net_flow_to_stage3_cr <= 8.00"
+    severity: Medium
+
+# Machine-readable form of the rules above. `field` names either a KPI in the
+# kpi_catalog or a derived figure the engine computes.
+validation_expressions:
+  V01: { field: nnpa_pct,               op: "<",  compare_field: gnpa_pct }
+  V02: { field: gnpa_pct,               op: "<=", threshold: 3.00 }
+  V03: { field: stage3_cr,              op: "==", compare_field: gnpa_cr, tolerance: 0.05 }
+  V04: { field: stage_sum_cr,           op: "==", compare_field: aum_cr,  tolerance: 0.05 }
+  V05: { field: ebitda_cr,              op: "<=", compare_field: revenue_cr }
+  V06: { field: pat_cr,                 op: "<=", compare_field: ebitda_cr }
+  V07: { field: disbursement_cr,        op: "<=", compare_field: aum_cr, compare_multiplier: 0.60 }
+  V08: { field: cost_of_funds_pct,      op: "<=", threshold: 9.00 }
+  V09: { field: provision_coverage_pct, op: ">=", threshold: 40.00 }
+  V10: { field: net_flow_to_stage3_cr,  op: "<=", threshold: 8.00 }
+
+# ------------------------------------------------------------------------------
+# 15. CROSS-SOURCE RECONCILIATION
+# ------------------------------------------------------------------------------
+# The segment ledger is the granular evidence; the quarterly feed is the reported
+# claim. A variance beyond tolerance is a data conflict for the finance team to
+# resolve - it is never averaged away or silently preferred.
+reconciliations:
+  - field: aum_cr
+    label: "AUM"
+    bottom_up: { source: segment, method: sum, column: aum_cr }
+    reported: { source: quarterly, column: aum_cr, row: current }
+    tolerance_pct: 1.0
+  - field: gnpa_cr
+    label: "Gross Stage 3 balance"
+    bottom_up: { source: segment, method: sum, column: gnpa_cr }
+    reported: { source: quarterly, column: gnpa_cr, row: current }
+    tolerance_pct: 2.0
+  - field: stage2_cr
+    label: "Stage 2 exposure"
+    bottom_up: { source: segment, method: sum, column: stage2_cr }
+    reported: { source: quarterly, column: stage2_cr, row: current }
+    tolerance_pct: 2.0
+  - field: provision_coverage_pct
+    label: "Provision coverage"
+    bottom_up: { source: segment, method: ratio_of_sums_pct,
+                 numerator_column: provision_cr, denominator_column: gnpa_cr }
+    reported: { source: quarterly, method: ratio_of_columns_pct,
+                numerator_column: provision_cr, denominator_column: gnpa_cr, row: current }
+    tolerance_pct: 2.0
+
+# ------------------------------------------------------------------------------
+# 16. DERIVED FIGURES
+# ------------------------------------------------------------------------------
+# Computed by the engine from the feeds above and made available to validation,
+# risk rules and the commentary payload. These are not rendered as rows in the
+# comparison table but are quoted in the commentary.
+derived_metrics:
+  provision_coverage_pct:
+    label: "Provision Coverage Ratio (PCR)"
+    formula: "provision_cr / gnpa_cr * 100"
+    precision: 1
+  stage_sum_cr:
+    label: "Sum of Stage 1, 2 and 3 balances"
+    formula: "stage1_cr + stage2_cr + stage3_cr"
+    precision: 2
+  ebitda_margin_pct:
+    label: "EBITDA Margin"
+    formula: "ebitda_cr / revenue_cr * 100"
+    precision: 1
+  pat_margin_pct:
+    label: "PAT Margin"
+    formula: "pat_cr / revenue_cr * 100"
+    precision: 1
+  debt_to_equity:
+    label: "Debt-to-Equity"
+    formula: "borrowings_cr / net_worth_cr"
+    precision: 2
+  # Exceptional items are stripped so underlying performance can be stated
+  # alongside the reported figure. This is mandatory whenever one-offs exist.
+  pat_ex_oneoff_cr:
+    label: "PAT excluding exceptional items"
+    formula: "pat_cr - (sum of pbt-affecting one-off items * (1 - effective_tax_rate))"
+    precision: 1
+  aum_organic_growth_cr:
+    label: "Organic AUM growth"
+    formula: "(aum_cr - aum_prior_qtr_cr) - (sum of aum-affecting inorganic one-off items)"
+    precision: 1
+
+# ------------------------------------------------------------------------------
+# 17. STYLE CALIBRATION FROM PAST DECKS  (Section 5.3)
+# ------------------------------------------------------------------------------
+style_reference:
+  lookback_quarters: 3
+  # Sections whose past drafts were heavily edited by the finance team are given
+  # extra drafting care - a final_vs_draft_diff above this is a signal that the
+  # agent's previous starting quality was weak for that section.
+  high_edit_threshold_pct: 35.0
+  # One exemplar per section. Two gave the model no more signal about tone than
+  # one did, and the extra prompt weight is real on a token-metered provider.
+  max_exemplars_per_section: 1
+
+# ------------------------------------------------------------------------------
+# 18. OPERATIONAL BASELINE
+# ------------------------------------------------------------------------------
+# Used to quantify the benefit stated in the use case: time saved in deck prep.
+operational_baseline:
+  manual_minutes_per_commentary_section: 45
+  manual_minutes_metric_pack: 90
+  manual_minutes_risk_review: 40
+  review_minutes_per_section: 12   # what the finance team still spends refining

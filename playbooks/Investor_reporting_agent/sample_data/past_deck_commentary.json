@@ -1,0 +1,107 @@
+{
+  "_note": "Section 5.3 feed - approved commentary from prior decks, used purely as a tone, structure and vocabulary reference. Section ids match the five commentary cards rendered in the Atlas Hub Investor Reporting screen. final_vs_draft_diff records how heavily the finance team edited the agent's previous draft for that section; a high value tells the agent its starting quality was weak there and that section warrants extra care.",
+  "decks": [
+    {
+      "deck_quarter": "Q4 FY26",
+      "audience": "board",
+      "tone": "board_formal",
+      "approved_by": "CFO",
+      "approved_on": "2026-05-14",
+      "sections": [
+        {
+          "section": "aum_growth",
+          "commentary_text": "AUM closed the quarter at ₹1,113 Cr, an increase of ₹23 Cr or 2.1% over the preceding quarter and 5.6% over the same quarter a year earlier. Disbursements were ₹263 Cr against ₹260 Cr in the preceding quarter. Growth was led by Retail Loans and SME Loans, which together contributed the majority of the increase in book size. The Gold Loans portfolio continued to reduce as a share of AUM, consistent with the calibrated run-down the board reviewed in Q2 FY26.",
+          "final_vs_draft_diff": 19.0
+        },
+        {
+          "section": "asset_quality",
+          "commentary_text": "Gross NPA improved to 2.00% from 2.08% in the preceding quarter and 2.36% a year earlier. Net NPA was 1.10% against 1.14%. Provision coverage was 45.5%. Stage 2 assets rose to ₹71.2 Cr from ₹68.4 Cr, with the increase concentrated in the Commercial Vehicle book. Net new flow into Stage 3 was ₹4.9 Cr for the quarter. Collection efficiency across the portfolio was stable.",
+          "final_vs_draft_diff": 42.0
+        },
+        {
+          "section": "profitability",
+          "commentary_text": "Revenue for the quarter was ₹382 Cr, 1.0% above the preceding quarter. EBITDA was ₹71 Cr and profit after tax was ₹44 Cr. The EBITDA margin was 18.7%, broadly unchanged. Operating expenses were ₹62.0 Cr. No exceptional items were recognised during the quarter.",
+          "final_vs_draft_diff": 26.0
+        },
+        {
+          "section": "funding_cost",
+          "commentary_text": "The cost of funds rose to 8.30% from 8.24% in the preceding quarter and 8.04% a year earlier, reflecting the repricing of floating-rate bank facilities following the change in the policy rate. Total borrowings stood at ₹897.6 Cr against net worth of ₹253.4 Cr.",
+          "final_vs_draft_diff": 15.0
+        },
+        {
+          "section": "executive_summary",
+          "commentary_text": "AUM stood at ₹1,113 Cr, 2.1% higher than the preceding quarter. Profit after tax was ₹44 Cr. Gross NPA improved to 2.00% from 2.08%, the fourth consecutive quarter of improvement, while Stage 2 assets increased. The cost of funds rose 6 basis points to 8.30%. Two items were placed before the board: the increase in Stage 2 exposure in the Commercial Vehicle book, and a variance between provision coverage computed from the segment ledger and the figure reported by the ECL engine.",
+          "final_vs_draft_diff": 33.0
+        }
+      ]
+    },
+    {
+      "deck_quarter": "Q3 FY26",
+      "audience": "investor",
+      "tone": "investor_narrative",
+      "approved_by": "CFO",
+      "approved_on": "2026-02-11",
+      "sections": [
+        {
+          "section": "aum_growth",
+          "commentary_text": "AUM reached ₹1,090 Cr, an increase of 1.7% over the preceding quarter. Disbursements were ₹260 Cr. Growth was broad-based across the secured books, with SME Construction contributing a share of the increase larger than its opening weight in the portfolio.",
+          "final_vs_draft_diff": 23.0
+        },
+        {
+          "section": "asset_quality",
+          "commentary_text": "Gross NPA was 2.08% against 2.16% in the preceding quarter. Net NPA was 1.14% and provision coverage was 45.7%. Stage 2 assets were ₹68.4 Cr. Net new flow into Stage 3 was ₹4.7 Cr.",
+          "final_vs_draft_diff": 37.0
+        },
+        {
+          "section": "profitability",
+          "commentary_text": "Revenue was ₹379 Cr and EBITDA was ₹71 Cr. Profit after tax was ₹43 Cr against ₹43 Cr in the preceding quarter. Operating expenses were ₹61.3 Cr.",
+          "final_vs_draft_diff": 28.0
+        },
+        {
+          "section": "funding_cost",
+          "commentary_text": "The cost of funds was 8.24%, 6 basis points above the preceding quarter. Borrowings stood at ₹879.4 Cr.",
+          "final_vs_draft_diff": 17.0
+        },
+        {
+          "section": "executive_summary",
+          "commentary_text": "AUM was ₹1,090 Cr, 1.7% higher than the preceding quarter. Profit after tax was ₹43 Cr. Gross NPA improved to 2.08%. The cost of funds rose 6 basis points.",
+          "final_vs_draft_diff": 21.0
+        }
+      ]
+    },
+    {
+      "deck_quarter": "Q2 FY26",
+      "audience": "investor",
+      "tone": "investor_narrative",
+      "approved_by": "CFO",
+      "approved_on": "2025-11-07",
+      "sections": [
+        {
+          "section": "aum_growth",
+          "commentary_text": "AUM stood at ₹1,072 Cr at the close of the quarter, 1.6% above the preceding quarter. Disbursements were ₹256 Cr.",
+          "final_vs_draft_diff": 25.0
+        },
+        {
+          "section": "asset_quality",
+          "commentary_text": "Gross NPA was 2.16% and net NPA was 1.18%. Provision coverage was 45.9%. Delinquency in the Commercial Vehicle book remained above the portfolio average and origination cut-offs in that segment were tightened during the quarter.",
+          "final_vs_draft_diff": 46.0
+        },
+        {
+          "section": "profitability",
+          "commentary_text": "Revenue was ₹375 Cr and profit after tax was ₹43 Cr. EBITDA was ₹70 Cr.",
+          "final_vs_draft_diff": 30.0
+        },
+        {
+          "section": "funding_cost",
+          "commentary_text": "The cost of funds rose to 8.18% from 8.10%. Borrowings were ₹864.8 Cr.",
+          "final_vs_draft_diff": 14.0
+        },
+        {
+          "section": "executive_summary",
+          "commentary_text": "AUM was ₹1,072 Cr, 1.6% higher than the preceding quarter. Profit after tax was ₹43 Cr. Gross NPA improved to 2.16% from 2.25%.",
+          "final_vs_draft_diff": 22.0
+        }
+      ]
+    }
+  ]
+}

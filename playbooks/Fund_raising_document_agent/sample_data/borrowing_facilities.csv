@@ -1,0 +1,11 @@
+facility_id,lender_name,facility_type,sanctioned_amount_cr,outstanding_balance_cr,interest_rate_pct,tenure_months,maturity_date,covenant_dscr_min,covenant_de_max,status
+FAC-001,State Bank of India,Rupee Term Loan,150.0,135.0,8.75,60,2028-09-30,1.25,4.00,Active
+FAC-002,HDFC Bank,Rupee Term Loan,120.0,108.0,8.60,48,2027-12-31,1.25,4.00,Active
+FAC-003,Axis Bank,Term Loan Facility,100.0,90.0,8.80,60,2029-03-31,1.25,4.00,Active
+FAC-004,CRISIL Rated NCD Series I,Non-Convertible Debenture,80.0,80.0,9.15,36,2027-06-30,1.25,4.00,Active
+FAC-005,ICRA Rated NCD Series II,Non-Convertible Debenture,75.0,75.0,9.25,36,2027-11-30,1.25,4.00,Active
+FAC-006,NABARD Refinance Facility,Refinance Line,60.0,52.0,7.90,60,2029-06-30,1.25,4.00,Active
+FAC-007,Bank of Baroda,Cash Credit / OD Line,50.0,45.0,8.95,12,2026-10-31,1.25,4.00,Under Renewal
+FAC-008,ICICI Bank,Rupee Term Loan,45.0,40.0,8.70,48,2028-03-31,1.25,4.00,Active
+FAC-009,SIDBI MSME Credit Line,Special Refinance,35.0,30.0,7.75,36,2027-08-31,1.25,4.00,Active
+FAC-010,Union Bank Commercial Paper,Commercial Paper,25.0,25.0,8.40,6,2026-11-30,1.25,4.00,Active

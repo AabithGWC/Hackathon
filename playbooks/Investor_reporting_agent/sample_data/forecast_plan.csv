@@ -1,0 +1,12 @@
+reporting_quarter,metric_key,forecast_value,basis,approved_by,approved_on
+Q2 FY27,aum_cr,1320.0,Board-approved annual operating plan FY27,Board,2026-04-24
+Q2 FY27,disbursement_cr,310.0,Board-approved annual operating plan FY27,Board,2026-04-24
+Q2 FY27,revenue_cr,450.0,Board-approved annual operating plan FY27,Board,2026-04-24
+Q2 FY27,ebitda_cr,90.0,Board-approved annual operating plan FY27,Board,2026-04-24
+Q2 FY27,pat_cr,53.0,Board-approved annual operating plan FY27,Board,2026-04-24
+Q2 FY27,gnpa_pct,1.75,Risk committee credit outlook FY27,Risk Committee,2026-04-30
+Q2 FY27,nnpa_pct,0.88,Risk committee credit outlook FY27,Risk Committee,2026-04-30
+Q2 FY27,cost_of_funds_pct,8.50,ALCO funding plan Q2 FY27,ALCO,2026-05-08
+Q2 FY27,stage1_cr,1204.9,ECL engine migration model,Risk Committee,2026-04-30
+Q2 FY27,stage2_cr,92.0,ECL engine migration model,Risk Committee,2026-04-30
+Q2 FY27,stage3_cr,23.1,ECL engine migration model,Risk Committee,2026-04-30

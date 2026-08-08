@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FundRaisingDataPackOutput",
+  "type": "object",
+  "properties": {
+    "company_metadata": {
+      "type": "object",
+      "properties": {
+        "company_name": { "type": "string" },
+        "business_type": { "type": "string" },
+        "active_package": { "type": "string" },
+        "period": { "type": "string" },
+        "accounting_standard": { "type": "string" },
+        "confidentiality": { "type": "string" }
+      },
+      "required": ["company_name", "business_type", "active_package", "period"]
+    },
+    "financial_metrics": {
+      "type": "object",
+      "properties": {
+        "revenue_cr": { "type": "number" },
+        "revenue_yoy_pct": { "type": "number" },
+        "ebitda_cr": { "type": "number" },
+        "ebitda_yoy_pct": { "type": "number" },
+        "pat_cr": { "type": "number" },
+        "pat_yoy_pct": { "type": "number" },
+        "total_debt_cr": { "type": "number" },
+        "total_debt_qoq_pct": { "type": "number" },
+        "net_worth_cr": { "type": "number" },
+        "net_worth_yoy_pct": { "type": "number" }
+      },
+      "required": ["revenue_cr", "ebitda_cr", "pat_cr", "total_debt_cr", "net_worth_cr"]
+    },
+    "portfolio_metrics": {
+      "type": "object",
+      "properties": {
+        "aum_cr": { "type": "number" },
+        "aum_qoq_pct": { "type": "number" },
+        "disbursement_cr": { "type": "number" },
+        "collection_cr": { "type": "number" },
+        "gnpa_pct": { "type": "number" },
+        "nnpa_pct": { "type": "number" },
+        "collection_efficiency_pct": { "type": "number" },
+        "active_loans": { "type": "integer" }
+      },
+      "required": ["aum_cr", "disbursement_cr", "collection_cr", "gnpa_pct", "nnpa_pct", "collection_efficiency_pct"]
+    },
+    "key_ratios": {
+      "type": "object",
+      "properties": {
+        "dscr": { "type": "number" },
+        "debt_to_equity": { "type": "number" },
+        "interest_coverage": { "type": "number" },
+        "capital_adequacy_pct": { "type": "number" },
+        "roa_pct": { "type": "number" },
+        "roe_pct": { "type": "number" }
+      },
+      "required": ["dscr", "debt_to_equity", "interest_coverage", "capital_adequacy_pct", "roa_pct", "roe_pct"]
+    },
+    "operational_kpis": {
+      "type": "object",
+      "properties": {
+        "data_sources_connected": { "type": "integer" },
+        "sections_completed": { "type": "integer" },
+        "sections_total": { "type": "integer" },
+        "validation_checks_passed": { "type": "integer" },
+        "validation_checks_total": { "type": "integer" },
+        "items_needing_review": { "type": "integer" },
+        "pack_status": { "type": "string" },
+        "est_time_saved_hours": { "type": "number" }
+      },
+      "required": ["data_sources_connected", "sections_completed", "validation_checks_passed", "pack_status", "est_time_saved_hours"]
+    },
+    "review_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field_name": { "type": "string" },
+          "issue_type": { "type": "string" },
+          "recommended_action": { "type": "string" }
+        }
+      }
+    },
+    "ai_insights": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "recent_agent_activity": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "time": { "type": "string" },
+          "event": { "type": "string" },
+          "status": { "type": "string" }
+        }
+      }
+    }
+  },
+  "required": [
+    "company_metadata",
+    "financial_metrics",
+    "portfolio_metrics",
+    "key_ratios",
+    "operational_kpis",
+    "review_items",
+    "ai_insights",
+    "recent_agent_activity"
+  ]
+}

@@ -1,0 +1,237 @@
+# ==============================================================================
+# NBFC FUND-RAISING DOCUMENT AGENT - PLAYBOOK CONFIGURATION & KPI DEFINITIONS
+# ==============================================================================
+# Playbook Name: fund_raising_document_assembly
+# Purpose: Comprehensive KPI definition, financial calculation formulas, covenant
+#          thresholds, and target values matching the dashboard image exactly.
+# ==============================================================================
+
+playbook_name: fund_raising_document_assembly
+description: >
+  Complete KPI specification catalog used by the Fund-Raising Document Agent to
+  calculate, validate, and assemble data packs for NCD Issuances, Bank Line
+  Renewals, and Credit Rating Submissions.
+
+# ------------------------------------------------------------------------------
+# 1. INPUT DATA SOURCES (8 System Integrations)
+# ------------------------------------------------------------------------------
+inputs:
+  primary_dataset: sample_data/fund_raising_data.json
+  template_type: NCD_Issuance # Options: NCD_Issuance, Bank_Facility_Renewal, Rating_Agency_Submission, Equity_Pitch
+  connected_sources:
+    - LMS_Transactions           # Loan Management System disbursement & repayment ledger
+    - Bank_Statements            # Bank credit & debit statements
+    - General_Ledger             # Accounting GL journal entries
+    - Borrowing_Schedule         # NCDs, Bank Term Loans, Cash Credit / OD facility limits
+    - Credit_Rating_Letters      # CRISIL / ICRA / CARE credit rating documentation
+    - MCA_Regulatory_Filings     # Shareholder patterns & ROC returns
+    - Asset_Quality_DPD_Buckets  # Vintage aging & DPD provision data
+    - Statutory_Audit_Reports    # Audited Ind AS financial statements
+
+# ------------------------------------------------------------------------------
+# 2. FINANCIAL METRICS KPI DEFINITIONS & EXACT TARGET VALUES
+# ------------------------------------------------------------------------------
+financial_metrics_kpi:
+  revenue_cr:
+    label: "Total Revenue"
+    value: 425.0
+    unit: "INR Crore"
+    description: "Total Operating Income plus Interest Income from loan portfolio"
+  revenue_yoy_pct:
+    label: "Revenue YoY Growth"
+    value: 11.2
+    formula: "((Revenue_Current - Revenue_Prior) / Revenue_Prior) * 100"
+    unit: "Percentage"
+  ebitda_cr:
+    label: "EBITDA"
+    value: 82.0
+    formula: "PAT + Tax_Expense + Depreciation + Interest_Expense"
+    unit: "INR Crore"
+  ebitda_yoy_pct:
+    label: "EBITDA YoY Growth"
+    value: 14.8
+    formula: "((EBITDA_Current - EBITDA_Prior) / EBITDA_Prior) * 100"
+    unit: "Percentage"
+  pat_cr:
+    label: "Profit After Tax (PAT)"
+    value: 48.0
+    description: "Net profit after tax deductions as per Ind AS standards"
+    unit: "INR Crore"
+  pat_yoy_pct:
+    label: "PAT YoY Growth"
+    value: 9.4
+    formula: "((PAT_Current - PAT_Prior) / PAT_Prior) * 100"
+    unit: "Percentage"
+  total_debt_cr:
+    label: "Total Debt / Borrowings"
+    value: 680.0
+    description: "Aggregate outstanding debt across NCDs, Bank Term Loans, Cash Credit & Commercial Paper"
+    unit: "INR Crore"
+  total_debt_yoy_pct:
+    label: "Total Debt YoY Growth"
+    value: 8.1
+    formula: "((Total_Debt_Current - Total_Debt_Prior) / Total_Debt_Prior) * 100"
+    unit: "Percentage"
+  net_worth_cr:
+    label: "Net Worth / Tangible Net Worth"
+    value: 325.0
+    description: "Paid-up Equity Share Capital plus Free Reserves minus Intangible Assets"
+    unit: "INR Crore"
+  net_worth_yoy_pct:
+    label: "Net Worth YoY Growth"
+    value: 7.5
+    formula: "((Net_Worth_Current - Net_Worth_Prior) / Net_Worth_Prior) * 100"
+    unit: "Percentage"
+
+# ------------------------------------------------------------------------------
+# 3. PORTFOLIO QUALITY & ASSET METRICS KPI DEFINITIONS
+# ------------------------------------------------------------------------------
+portfolio_metrics_kpi:
+  aum_cr:
+    label: "Assets Under Management (AUM)"
+    value: 1250.0
+    unit: "INR Crore"
+  aum_qoq_pct:
+    label: "AUM QoQ Growth"
+    value: 12.3
+    formula: "((AUM_Current - AUM_Prior_Qtr) / AUM_Prior_Qtr) * 100"
+    unit: "Percentage"
+  disbursement_cr:
+    label: "Quarterly Disbursements"
+    value: 285.0
+    unit: "INR Crore"
+  collection_cr:
+    label: "Quarterly Collections"
+    value: 240.0
+    unit: "INR Crore"
+  gnpa_pct:
+    label: "Gross Non-Performing Assets (GNPA %)"
+    value: 1.80
+    previous_value: 2.00
+    formula: "(Gross_NPA_Amount / Total_AUM) * 100"
+    unit: "Percentage"
+  nnpa_pct:
+    label: "Net Non-Performing Assets (NNPA %)"
+    value: 0.92
+    formula: "((Gross_NPA_Amount - Provision_Amount) / (Total_AUM - Provision_Amount)) * 100"
+    unit: "Percentage"
+  collection_efficiency_pct:
+    label: "Collection Efficiency %"
+    value: 96.4
+    formula: "(Actual_Collections / Total_Billing_Demand) * 100"
+    unit: "Percentage"
+  active_loans:
+    label: "Active Loan Accounts"
+    value: 82450
+    unit: "Integer Count"
+
+# ------------------------------------------------------------------------------
+# 4. KEY FINANCIAL RATIOS & LENDER COVENANT THRESHOLDS
+# ------------------------------------------------------------------------------
+key_ratios_kpi:
+  dscr:
+    label: "Debt Service Coverage Ratio (DSCR)"
+    value: 1.42
+    covenant_threshold: 1.25
+    covenant_rule: ">= 1.25"
+    unit: "Multiple (x)"
+  debt_to_equity:
+    label: "Debt-to-Equity Ratio (Leverage)"
+    value: 2.10
+    previous_value: 1.92
+    covenant_threshold: 4.00
+    covenant_rule: "<= 4.00"
+    unit: "Multiple (x)"
+  interest_coverage:
+    label: "Interest Coverage Ratio (ICR)"
+    value: 2.80
+    covenant_threshold: 2.00
+    covenant_rule: ">= 2.00"
+    unit: "Multiple (x)"
+  capital_adequacy_pct:
+    label: "Capital Adequacy Ratio (CRAR %)"
+    value: 18.6
+    covenant_threshold: 15.00
+    covenant_rule: ">= 15.00"
+    unit: "Percentage"
+  roa_pct:
+    label: "Return on Assets (ROA %)"
+    value: 2.35
+    target_benchmark: 2.00
+    unit: "Percentage"
+  roe_pct:
+    label: "Return on Equity (ROE %)"
+    value: 15.2
+    target_benchmark: 14.00
+    unit: "Percentage"
+
+# ------------------------------------------------------------------------------
+# 5. OPERATIONAL & VALIDATION CHECKS METRICS
+# ------------------------------------------------------------------------------
+operational_kpis:
+  data_sources_connected: 8
+  data_sources_status: "All Active"
+  sections_completed: 12
+  sections_total: 12
+  completion_pct: 100.0
+  validation_checks_passed: 42
+  validation_checks_total: 42
+  items_needing_review: 3
+  pack_status: "Ready for Review"
+  est_time_saved_hours: 12.6
+
+# ------------------------------------------------------------------------------
+# 6. ITEMS REQUIRING FINANCE TEAM REVIEW (3 Items)
+# ------------------------------------------------------------------------------
+review_items:
+  - id: 1
+    field_name: "Cost of Borrowing"
+    issue_type: "Missing"
+    recommended_action: "Provide detailed bank tranche breakdown"
+  - id: 2
+    field_name: "Rating"
+    issue_type: "Outdated"
+    recommended_action: "Update latest ICRA/CRISIL rating letter"
+  - id: 3
+    field_name: "Promoter Holding"
+    issue_type: "Conflict"
+    recommended_action: "Two source data differ"
+
+# ------------------------------------------------------------------------------
+# 7. STRATEGIC AI CFO INSIGHT BULLETS
+# ------------------------------------------------------------------------------
+ai_insights:
+  - "AUM increased 12.3% compared with previous quarter."
+  - "Total debt increased 8.1% QoQ."
+  - "GNPA improved from 2.0% to 1.80%."
+  - "Debt/Equity increased from 1.92x to 2.10x."
+  - "DSCR remains above the threshold (1.42x)."
+
+# ------------------------------------------------------------------------------
+# 8. EXPLICIT VALIDATION RULES CATALOG (42 Rules)
+# ------------------------------------------------------------------------------
+validation_rules:
+  - id: V01
+    name: "Balance Sheet Identity"
+    rule: "Total_Assets == Total_Liabilities + Net_Worth"
+  - id: V02
+    name: "Debt-to-Equity Covenant"
+    rule: "debt_to_equity (2.10) <= 4.00"
+  - id: V03
+    name: "Capital Adequacy Covenant"
+    rule: "capital_adequacy_pct (18.6%) >= 15.00%"
+  - id: V04
+    name: "DSCR Covenant"
+    rule: "dscr (1.42x) >= 1.25x"
+  - id: V05
+    name: "Interest Coverage Covenant"
+    rule: "interest_coverage (2.80x) >= 2.00x"
+  - id: V06
+    name: "GNPA Maximum Limit"
+    rule: "gnpa_pct (1.80%) <= 3.00%"
+  - id: V07
+    name: "Net NPA Provision Sanity"
+    rule: "nnpa_pct (0.92%) < gnpa_pct (1.80%)"
+  - id: V08
+    name: "Collection Efficiency Minimum"
+    rule: "collection_efficiency_pct (96.4%) >= 90.00%"
