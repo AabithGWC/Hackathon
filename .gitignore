@@ -2,6 +2,10 @@
 .env
 *.env.local
 
+# SQLite Databases & Local Run Stores
+*.db
+agent_runs.db
+
 # Python Bytecode & Cache
 __pycache__/
 *.py[cod]
