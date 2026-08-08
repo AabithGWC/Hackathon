@@ -1,0 +1,26 @@
+# ==============================================================================
+# NBFC EXPENSE ANOMALY DETECTION AGENT - PLAYBOOK CONFIGURATION
+# ==============================================================================
+# Playbook Name: expense_anomaly_detection
+# Agent Purpose: Scan branch & vendor payments for spend spikes, duplicate invoices,
+#                policy limit violations, and potential leakage.
+# ==============================================================================
+
+playbook_name: expense_anomaly_detection
+description: >
+  Scans multi-branch vendor payments and ledger expenses to flag spend spikes,
+  duplicate payments, and policy threshold breaches, followed by AI anomaly explanation.
+
+inputs:
+  branch_expense_payments: sample_data/branch_expense_payments.csv
+  policy_thresholds: sample_data/policy_thresholds.csv
+
+upstream_dependencies: []
+
+scan:
+  scan_type: full_scan
+  rules_applied: 72
+
+llm:
+  batch_size: 10
+  manual_review_minutes_per_break: 5

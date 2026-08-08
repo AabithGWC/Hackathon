@@ -1,0 +1,29 @@
+# ==============================================================================
+# NBFC CASH FLOW & LIQUIDITY FORECASTING AGENT - PLAYBOOK CONFIGURATION
+# ==============================================================================
+# Playbook Name: cashflow_forecasting
+# Agent Purpose: Automated 13-Week Cash Flow & Liquidity Forecasting, Buffer Shortfall Alerting,
+#                and Scenario Stress Testing.
+# ==============================================================================
+
+playbook_name: cashflow_forecasting
+description: >
+  Performs 13-week cash flow modeling across projected collection inflows,
+  scheduled loan disbursement outflows, upcoming debt maturities, and treasury reserves.
+
+inputs:
+  cashflow_inflows: sample_data/cashflow_inflows.csv
+  cashflow_outflows: sample_data/cashflow_outflows.csv
+  debt_maturities: sample_data/debt_maturities.csv
+  treasury_liquidity: sample_data/treasury_liquidity.csv
+
+upstream_dependencies:
+  - reconciliation
+
+forecasting:
+  forecast_horizon_weeks: 13
+  required_buffer_cr: 100
+
+llm:
+  batch_size: 10
+  manual_review_minutes_per_break: 5

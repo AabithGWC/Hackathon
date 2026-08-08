@@ -1,0 +1,45 @@
+# ==============================================================================
+# NBFC FINANCE RECONCILIATION AGENT - PLAYBOOK CONFIGURATION
+# ==============================================================================
+# Playbook Name: reconciliation
+# Agent Purpose: Perform automated three-way transaction reconciliation across
+#                Loan Management Systems (LMS), Bank Statements, and General Ledger (GL).
+# ==============================================================================
+
+playbook_name: reconciliation
+description: >
+  Performs rule-based 3-way matching across LMS transactions, bank statements,
+  and GL entries for NBFC financial auditing, followed by Groq Llama 3.3 70B
+  LLM break adjudication and executive run-over-run insight generation.
+
+# ------------------------------------------------------------------------------
+# INPUT DATA SOURCES (CSV File Paths)
+# ------------------------------------------------------------------------------
+# Defines the primary financial ledger CSV inputs. Relative paths resolve
+# from the repository root directory.
+inputs:
+  lms_transactions: sample_data/lms_transactions.csv  # Primary loan disbursement & repayment ledger
+  bank_statement: sample_data/bank_statement.csv      # Bank transaction statements (Credit/Debit entries)
+  gl_entries: sample_data/gl_entries.csv              # Accounting General Ledger posting entries
+
+# ------------------------------------------------------------------------------
+# UPSTREAM PLAYBOOK DEPENDENCIES
+# ------------------------------------------------------------------------------
+# Specifies prior agent playbook runs required before executing this playbook.
+upstream_dependencies: []
+
+# ------------------------------------------------------------------------------
+# RULE-BASED MATCHING PARAMETERS (Pre-Processing Engine)
+# ------------------------------------------------------------------------------
+# Parameters governing exact vs. window matching during deterministic Python pre-processing.
+matching:
+  date_tolerance_days: 3  # Maximum allowed calendar day variance between transaction date & value/posting date
+  amount_exact: true      # Enforces strict monetary amount matching (floating-point tolerance <= 0.005)
+
+# ------------------------------------------------------------------------------
+# LLM ADJUDICATION & EFFORT METRICS CONFIGURATION
+# ------------------------------------------------------------------------------
+# Settings governing LLM invocation batching, risk thresholds, and labor metrics.
+llm:
+  batch_size: 10                       # Number of breaks processed per batch
+  manual_review_minutes_per_break: 3   # Benchmark manual audit minutes saved per auto-matched transaction

@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CoFAIRecommendation",
+  "type": "object",
+  "properties": {
+    "narrative": {
+      "type": "string"
+    },
+    "rationale": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "recommended_timing": {
+      "type": "object",
+      "properties": {
+        "issuance_window": {
+          "type": "string"
+        },
+        "rationale": {
+          "type": "string"
+        }
+      },
+      "required": ["issuance_window", "rationale"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["narrative", "rationale", "recommended_timing"],
+  "additionalProperties": false
+}

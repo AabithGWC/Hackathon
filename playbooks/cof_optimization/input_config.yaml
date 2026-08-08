@@ -1,0 +1,29 @@
+# ==============================================================================
+# NBFC COST OF FUNDS (CoF) OPTIMIZATION AGENT - PLAYBOOK CONFIGURATION
+# ==============================================================================
+# Playbook Name: cof_optimization
+# Agent Purpose: Minimize blended borrowing cost, optimize debt capital mix,
+#                and manage interest rate & refinancing risk.
+# ==============================================================================
+
+playbook_name: cof_optimization
+description: >
+  Models optimal funding mix across Term Loans, NCDs, and Securitization.
+  Incorporates upstream liquidity shortfall requirements from cashflow_forecasting,
+  followed by LLM borrowing strategy adjudication and CFO rate-risk insights.
+
+inputs:
+  current_debt_mix: sample_data/current_debt_mix.csv
+  market_rates: sample_data/market_rates.csv
+  maturity_profile: sample_data/maturity_profile.csv
+
+upstream_dependencies:
+  - cashflow_forecasting
+
+optimization:
+  target_funding_requirement_cr: 250
+  target_max_refinancing_risk_pct: 35.0
+
+llm:
+  batch_size: 10
+  manual_review_minutes_per_break: 5

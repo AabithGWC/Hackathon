@@ -1,0 +1,4 @@
+migration_path,amount_cr,impact_cr
+stage_1_to_2,48.0,2.4
+stage_2_to_3,12.0,1.9
+net_new_flow_to_stage_3,6.0,0.8

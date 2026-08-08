@@ -1,0 +1,6 @@
+id,date,branch,vendor,category,amount,invoice_ref
+EXP-1023,2026-08-07,Chennai,ABC Office Supplies,Office Supplies,850000,INV-CHEN-0891
+EXP-1024,2026-08-07,Mumbai,XYZ Services,IT Services,420000,INV-MUM-9912
+EXP-1024-DUP,2026-08-07,Mumbai,XYZ Services,IT Services,420000,INV-MUM-9912
+EXP-1025,2026-08-06,Delhi,PQR Logistics,Logistics,280000,INV-DEL-3314
+EXP-1026,2026-08-05,Bengaluru,TechPro Solutions,IT Infrastructure,1500000,INV-BLR-0042

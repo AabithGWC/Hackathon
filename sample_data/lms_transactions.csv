@@ -1,0 +1,6 @@
+transaction_id,loan_account_no,transaction_type,amount,transaction_date,borrower_name,branch_code,mode,reference_no
+LMS100000,LN100001,Prepayment,137767.9,2026-07-12,Sanjay Bhatt,BR003,Cheque,REF2026000001
+LMS100001,LN100002,Repayment,57302.99,2026-07-23,Pooja Joshi,BR003,Cheque,REF2026000002
+LMS100002,LN100003,Disbursement,157753.54,2026-08-01,Priya Patel,BR006,IMPS,REF2026000003
+LMS100003,LN100004,Disbursement,346887.87,2026-07-22,Naveen Rathi,BR003,RTGS,REF2026000004
+LMS100004,LN100005,Penal Charge,1257.08,2026-07-18,Naveen Rathi,BR004,IMPS,REF2026000005

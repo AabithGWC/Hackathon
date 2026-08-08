@@ -1,0 +1,6 @@
+pandas
+groq
+pyyaml
+jsonschema
+python-dotenv
+

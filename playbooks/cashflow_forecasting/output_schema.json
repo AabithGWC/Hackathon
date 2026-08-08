@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CashflowAIRecommendation",
+  "type": "object",
+  "properties": {
+    "narrative": {
+      "type": "string"
+    },
+    "minimum_projected_cash_balance_cr": {
+      "type": "number"
+    },
+    "required_liquidity_buffer_cr": {
+      "type": "number"
+    },
+    "expected_shortfall_cr": {
+      "type": "number"
+    },
+    "recommended_borrowing_cr": {
+      "type": "number"
+    },
+    "recommended_drawdown_window": {
+      "type": "string"
+    },
+    "confidence_score_pct": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "narrative",
+    "minimum_projected_cash_balance_cr",
+    "required_liquidity_buffer_cr",
+    "expected_shortfall_cr",
+    "recommended_borrowing_cr",
+    "recommended_drawdown_window",
+    "confidence_score_pct"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,29 @@
+# ==============================================================================
+# NBFC NPA PROVISIONING FORECAST AGENT - PLAYBOOK CONFIGURATION
+# ==============================================================================
+# Playbook Name: npa_provisioning_forecast
+# Agent Purpose: Forecasts quarter-end Expected Credit Loss (ECL) provisioning needs,
+#                Stage 1/2/3 migrations, GNPA trajectory, and capital/PAT impact.
+# ==============================================================================
+
+playbook_name: npa_provisioning_forecast
+description: >
+  Models ECL provisioning by portfolio segment, stage migration transitions,
+  and macro sensitivity ahead of quarter close for proactive earnings planning.
+
+inputs:
+  portfolio_segmentation: sample_data/ecl_portfolio_segmentation.csv
+  stage_migration: sample_data/stage_migration.csv
+  delinquency_history: sample_data/delinquency_history.csv
+
+upstream_dependencies: []
+
+forecast_parameters:
+  quarter_label: Q2 FY26-27
+  quarter_end_date: 2026-09-30
+  lead_time_days_before_quarter_close: 52
+  budget_provision_cr: 47.0
+
+llm:
+  batch_size: 10
+  manual_review_minutes_per_break: 5
