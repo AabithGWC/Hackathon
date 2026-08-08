@@ -34,7 +34,21 @@ BATCH_SIZE = 10
 MAX_CONCURRENT_LLM_CALLS = 3
 
 
+PLAYBOOK_ALIASES = {
+    "npa_provisioning_forcast": "npa_provisioning_forecast",
+    "npa_forecast": "npa_provisioning_forecast",
+    "cashflow": "cashflow_forecasting",
+    "cof": "cof_optimization",
+    "expense": "expense_anomaly_detection",
+}
+
+
+def normalize_playbook_name(name: str) -> str:
+    return PLAYBOOK_ALIASES.get(name.lower(), name)
+
+
 def load_playbook_module(playbook_name: str, module_filename: str):
+    playbook_name = normalize_playbook_name(playbook_name)
     module_path = os.path.join(PLAYBOOKS_DIR, playbook_name, module_filename)
     if not os.path.exists(module_path):
         raise FileNotFoundError(f"Playbook module not found: {module_path}")
@@ -45,18 +59,21 @@ def load_playbook_module(playbook_name: str, module_filename: str):
 
 
 def load_playbook_text(playbook_name: str, filename: str) -> str:
+    playbook_name = normalize_playbook_name(playbook_name)
     path = os.path.join(PLAYBOOKS_DIR, playbook_name, filename)
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
 
 def load_playbook_config(playbook_name: str) -> dict:
+    playbook_name = normalize_playbook_name(playbook_name)
     path = os.path.join(PLAYBOOKS_DIR, playbook_name, "input_config.yaml")
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 def load_playbook_schema(playbook_name: str) -> dict:
+    playbook_name = normalize_playbook_name(playbook_name)
     path = os.path.join(PLAYBOOKS_DIR, playbook_name, "output_schema.json")
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
@@ -179,6 +196,7 @@ def build_reconciliation_summary(summary: dict, adjudicated_breaks: list) -> dic
 
 
 def run(playbook_name: str):
+    playbook_name = normalize_playbook_name(playbook_name)
     config = load_playbook_config(playbook_name)
     preprocess = load_playbook_module(playbook_name, "preprocess.py")
 
