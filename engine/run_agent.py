@@ -440,6 +440,7 @@ def run(playbook_name: str):
                 ],
             },
             "summary": summary,
+            "reconciliation_trend": preprocessed.get("reconciliation_trend", []),
             "breaks_by_reason": preprocessed["breaks_by_reason"],
             "breaks_by_aging": preprocessed["breaks_by_aging"],
             "top_breaks": build_top_breaks(adjudicated_breaks),
