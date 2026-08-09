@@ -15,7 +15,7 @@ import argparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from engine import run_agent
+from investor_engine import run_agent
 
 
 def main(argv=None):

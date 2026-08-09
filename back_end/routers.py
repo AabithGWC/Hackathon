@@ -151,11 +151,7 @@ def run_investor_report(body: Optional[InvestorReportRunRequest] = None):
         tone = body.tone if body else "board_formal"
         audience = body.audience if body else "board"
 
-        inv_path = os.path.join(REPO_ROOT, "playbooks", "Investor_reporting_agent")
-        if inv_path not in sys.path:
-            sys.path.insert(0, inv_path)
-
-        from engine.pipeline import run_agent as inv_pipeline_run
+        from playbooks.Investor_reporting_agent.investor_engine.pipeline import run_agent as inv_pipeline_run
 
         result = inv_pipeline_run(tone=tone, audience=audience, verbose=False)
         run_id = f"investor_report_{datetime.now().strftime('%Y-%m-%d_%H%M')}"
