@@ -1,5 +1,4 @@
 # Environment & Secret files
-.env
 *.env.local
 
 # SQLite Databases & Local Run Stores
