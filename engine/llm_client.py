@@ -11,18 +11,23 @@ import urllib.error
 DEFAULT_GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant")
 DEFAULT_OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1")
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
+OLLAMA_API_KEY = os.environ.get("OLLAMA_API_KEY", "")
 PROVIDER = os.environ.get("LLM_PROVIDER", "auto").lower()  # "ollama", "groq", "auto"
 MAX_RATE_LIMIT_RETRIES = 3
 
 
 def is_ollama_available(host: str = OLLAMA_HOST) -> bool:
-    """Check if local Ollama server is active and responding."""
+    """Check if local/remote Ollama server is active and responding."""
     try:
-        req = urllib.request.Request(f"{host}/api/tags", method="GET")
+        headers = {}
+        if OLLAMA_API_KEY:
+            headers["Authorization"] = f"Bearer {OLLAMA_API_KEY}"
+        req = urllib.request.Request(f"{host}/api/tags", headers=headers, method="GET")
         with urllib.request.urlopen(req, timeout=1.5) as resp:
             return resp.status == 200
     except Exception:
         return False
+
 
 
 class LLMClient:
@@ -83,12 +88,17 @@ class LLMClient:
             payload["format"] = "json"
 
         data = json.dumps(payload).encode("utf-8")
+        headers = {"Content-Type": "application/json"}
+        if OLLAMA_API_KEY:
+            headers["Authorization"] = f"Bearer {OLLAMA_API_KEY}"
+
         req = urllib.request.Request(
             f"{self.ollama_host}/api/chat",
             data=data,
-            headers={"Content-Type": "application/json"},
+            headers=headers,
             method="POST",
         )
+
         try:
             with urllib.request.urlopen(req, timeout=120) as resp:
                 result = json.loads(resp.read().decode("utf-8"))
