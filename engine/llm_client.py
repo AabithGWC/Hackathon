@@ -169,8 +169,21 @@ class LLMClient:
         ]
 
         if self.provider == "ollama":
-            raw = self._call_ollama(messages, json_mode=True, temperature=temperature)
-            return json.loads(raw)
+            try:
+                raw = self._call_ollama(messages, json_mode=True, temperature=temperature)
+                return json.loads(raw)
+            except Exception as exc:
+                if self.api_keys:
+                    print(f"[LLMClient Warning] Ollama call failed ({exc}). Automatically falling back to Groq...")
+                    response = self._call_groq_with_backoff(
+                        model=DEFAULT_GROQ_MODEL,
+                        temperature=temperature,
+                        response_format={"type": "json_object"},
+                        messages=messages,
+                    )
+                    raw = response.choices[0].message.content
+                    return json.loads(raw)
+                raise exc
 
         # Groq execution
         response = self._call_groq_with_backoff(
@@ -190,7 +203,18 @@ class LLMClient:
         ]
 
         if self.provider == "ollama":
-            return self._call_ollama(messages, json_mode=False, temperature=temperature)
+            try:
+                return self._call_ollama(messages, json_mode=False, temperature=temperature)
+            except Exception as exc:
+                if self.api_keys:
+                    print(f"[LLMClient Warning] Ollama call failed ({exc}). Automatically falling back to Groq...")
+                    response = self._call_groq_with_backoff(
+                        model=DEFAULT_GROQ_MODEL,
+                        temperature=temperature,
+                        messages=messages,
+                    )
+                    return response.choices[0].message.content
+                raise exc
 
         # Groq execution
         response = self._call_groq_with_backoff(
@@ -199,3 +223,4 @@ class LLMClient:
             messages=messages,
         )
         return response.choices[0].message.content
+
