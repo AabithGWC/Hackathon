@@ -78,22 +78,35 @@ class LLMClient:
     # OLLAMA PROVIDER (LOCAL)
     # --------------------------------------------------------------------------
     def _call_ollama(self, messages: list, json_mode: bool = False, temperature: float = 0.2) -> str:
-        payload = {
-            "model": self.model,
-            "messages": messages,
-            "stream": False,
-            "options": {"temperature": temperature},
-        }
-        if json_mode:
-            payload["format"] = "json"
-
-        data = json.dumps(payload).encode("utf-8")
         headers = {"Content-Type": "application/json"}
         if OLLAMA_API_KEY:
             headers["Authorization"] = f"Bearer {OLLAMA_API_KEY}"
 
+        is_openai_compat = "/v1" in self.ollama_host or "openai" in self.ollama_host
+
+        if is_openai_compat:
+            endpoint = f"{self.ollama_host}/chat/completions" if not self.ollama_host.endswith("/chat/completions") else self.ollama_host
+            payload = {
+                "model": self.model,
+                "messages": messages,
+                "temperature": temperature,
+            }
+            if json_mode:
+                payload["response_format"] = {"type": "json_object"}
+        else:
+            endpoint = f"{self.ollama_host}/api/chat"
+            payload = {
+                "model": self.model,
+                "messages": messages,
+                "stream": False,
+                "options": {"temperature": temperature},
+            }
+            if json_mode:
+                payload["format"] = "json"
+
+        data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
-            f"{self.ollama_host}/api/chat",
+            endpoint,
             data=data,
             headers=headers,
             method="POST",
@@ -102,9 +115,12 @@ class LLMClient:
         try:
             with urllib.request.urlopen(req, timeout=120) as resp:
                 result = json.loads(resp.read().decode("utf-8"))
+                if is_openai_compat:
+                    return result["choices"][0]["message"]["content"]
                 return result.get("message", {}).get("content", "")
         except Exception as exc:
-            raise RuntimeError(f"Ollama request failed on model '{self.model}' at {self.ollama_host}: {exc}")
+            raise RuntimeError(f"Ollama/Cloud request failed on model '{self.model}' at {endpoint}: {exc}")
+
 
     # --------------------------------------------------------------------------
     # GROQ PROVIDER (CLOUD WITH MULTI-KEY ROTATION)
