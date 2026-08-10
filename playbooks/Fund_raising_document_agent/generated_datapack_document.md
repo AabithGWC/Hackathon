@@ -6,7 +6,7 @@
 
 ## EXECUTIVE SUMMARY & AGENT PERFORMANCE METRICS
 - **Reporting Period**: Q2 FY26
-- **Analysis Engine**: groq / openai/gpt-oss-120b (4 passes)
+- **Analysis Engine**: none (fallback) / deterministic plan (0 passes)
 - **Data Sources Connected**: 8 / 8 (All Active)
 - **Sections Completed**: 12 / 12 (100.0% Complete)
 - **Automated Validation Checks**: 7 / 8 Passed — 1 not evaluable from available data
@@ -22,7 +22,7 @@
 | **Revenue** | ₹440.0 Cr | +14.29% YoY | Strong |
 | **EBITDA** | ₹86.0 Cr | +14.67% YoY | Strong |
 | **Profit After Tax (PAT)** | ₹51.0 Cr | +21.43% YoY | Robust |
-| **Total Debt** | ₹705.0 Cr | +13.71% YoY | Managed |
+| **Total Debt** | ₹680.0 Cr | +13.71% YoY | Managed |
 | **Net Worth** | ₹338.0 Cr | +14.58% YoY | Expanded |
 
 ---
@@ -78,12 +78,10 @@
 ## 5. KEY FINANCIAL & LENDER COVENANT RATIOS
 | Ratio Name | Computed Value | Covenant Limit | Headroom | Status |
 | :--- | :---: | :---: | :--- | :---: |
-| **Debt Service Coverage Ratio (DSCR)** | **1.44x** | >= 1.25x | 0.19 | PASS [✓] |
-| **Debt-to-Equity Ratio (Leverage)** | **2.01x** | <= 4.0x | 1.99 | PASS [✓] |
-| **Interest Coverage Ratio (ICR)** | **2.85x** | >= 2.0x | 0.85 | PASS [✓] |
-| **Capital Adequacy Ratio (CRAR %)** | **18.9%** | >= 15.0% | 3.9 | PASS [✓] |
-| **Return on Assets (ROA %)** | **2.38%** | >= 2.0% | 0.38 | PASS [✓] |
-| **Return on Equity (ROE %)** | **15.4%** | >= 14.0% | 1.4 | PASS [✓] |
+| **Debt Service Coverage Ratio (DSCR)** | **1.44x** | >= 1.25x | 0.19x above the floor | PASS [✓] |
+| **Debt-to-Equity Ratio** | **2.01x** | <= 4.0x | 1.99x below the ceiling | PASS [✓] |
+| **Interest Coverage Ratio (ICR)** | **2.85x** | >= 2.0x | 0.85x above the floor | PASS [✓] |
+| **Capital Adequacy Ratio (CRAR)** | **18.9%** | >= 15.0% | 3.9% above the floor | PASS [✓] |
 
 ---
 
@@ -91,184 +89,48 @@
 | Metric | Bottom-Up (granular source) | As Reported (summary) | Variance | Status |
 | :--- | :---: | :---: | :---: | :---: |
 | aum_cr | 1250.0 | 1310.0 | 4.58% | **UNRECONCILED** |
+| total_debt_cr | 680.0 | 705.0 | 3.55% | **UNRECONCILED** |
 | gnpa_pct | 0.544 | 1.75 | 68.91% | **UNRECONCILED** |
 | nnpa_pct | 0.2471 | 0.88 | 71.92% | **UNRECONCILED** |
-| total_debt_cr | 705.0 | 705.0 | 0.0% | Agreed |
 
 ---
 
 ## 7. AUTOMATED VALIDATION RULE RESULTS (7/8 passed)
 | ID | Rule | Observed | Status |
 | :--- | :--- | :--- | :---: |
-| V01 | Balance Sheet Identity | Insufficient data | NOT_EVALUABLE |
-| V02 | Debt-to-Equity Covenant | 2.01 <= 4.00 | PASS |
-| V03 | Capital Adequacy Covenant | 18.9 >= 15.00 | PASS |
-| V04 | DSCR Covenant | 1.44 >= 1.25 | PASS |
-| V05 | Interest Coverage Covenant | 2.85 >= 2.00 | PASS |
-| V06 | GNPA Maximum Limit | 0.54 <= 3.00 | PASS |
-| V07 | Net NPA Provision Sanity | 0.25 < 0.54 | PASS |
-| V08 | Collection Efficiency Minimum | 96.59 >= 90.00 | PASS |
+| V01 | Balance Sheet Identity | required inputs not present in the source data | NOT_EVALUABLE |
+| V02 | Debt-to-Equity Covenant | debt_to_equity = 2.01 (<= 4.0) | PASS |
+| V03 | Capital Adequacy Covenant | capital_adequacy_pct = 18.9 (>= 15.0) | PASS |
+| V04 | DSCR Covenant | dscr = 1.44 (>= 1.25) | PASS |
+| V05 | Interest Coverage Covenant | interest_coverage = 2.85 (>= 2.0) | PASS |
+| V06 | GNPA Maximum Limit | gnpa_pct = 0.54 (<= 3.0) | PASS |
+| V07 | Net NPA Provision Sanity | gnpa_pct = 0.54 (<= 3.0) | PASS |
+| V08 | Collection Efficiency Minimum | collection_efficiency_pct = 96.59 (>= 90.0) | PASS |
 
 ---
 
-## 8. ITEMS REQUIRING FINANCE TEAM REVIEW (6)
-- **aum_cr** [Conflict]: Investigate source discrepancy between bottom‑up and reported AUM and reconcile to a single authoritative figure.
-- **gnpa_pct** [Conflict]: Validate GNPA calculations in both source systems and correct the inflated reported percentage.
-- **nnpa_pct** [Conflict]: Review NNPA data feeds for accuracy and align the reported figure with the bottom‑up computation.
+## 8. ITEMS REQUIRING FINANCE TEAM REVIEW (4)
 - **aum_cr** [Conflict]: Unreconciled variance of 4.58%: financial.aum_cr reports 1310.0 but bottom-up aggregation gives 1250.0. Confirm which figure the lender pack should carry.
+- **total_debt_cr** [Conflict]: Unreconciled variance of 3.55%: financial.total_debt_cr reports 705.0 but bottom-up aggregation gives 680.0. Confirm which figure the lender pack should carry.
 - **gnpa_pct** [Conflict]: Unreconciled variance of 68.91%: financial.gnpa_pct reports 1.75 but bottom-up aggregation gives 0.544. Confirm which figure the lender pack should carry.
 - **nnpa_pct** [Conflict]: Unreconciled variance of 71.92%: financial.nnpa_pct reports 0.88 but bottom-up aggregation gives 0.2471. Confirm which figure the lender pack should carry.
 
 ---
 
 ## 9. STRATEGIC AI CFO INSIGHTS
-- AUM grew to 1,250.0 Cr, registering a 4.8% QoQ increase, underscoring continued portfolio expansion.
-- Total debt rose to 705.0 Cr (+13.71% YoY) while the debt‑to‑equity ratio improved to 2.01x, comfortably below the 4.0x covenant ceiling.
-- Asset quality is strong: GNPA fell to 0.54% (down from 1.8% prior) and NNPA is at 0.25%, both well within the 3.0% and internal limits.
-- DSCR stands at 1.44x, providing a 0.19x buffer above the 1.25x covenant requirement, indicating solid debt service capacity.
-- Capital adequacy is robust at 18.9%, exceeding the 15% regulatory minimum, and ROE of 15.4% surpasses the 14% benchmark.
+- AUM stands at Rs.1250.0 Cr, 4.8% QoQ.
+- Total borrowings of Rs.680.0 Cr give a debt/equity of 2.01x.
+- GNPA at 0.54% and NNPA at 0.25% on a bottom-up basis.
+- DSCR of 1.44x against the 1.25x covenant floor.
+- Generated without LLM commentary - the analysis engine was unreachable.
 
 ---
 
 ## 10. METHODOLOGY NOTES
-- R
-- e
-- p
-- l
-- a
-- c
-- e
-- d
--  
-- i
-- n
-- v
-- a
-- l
-- i
-- d
--  
-- '
-- r
-- a
-- t
-- i
-- o
-- _
-- o
-- f
-- _
-- s
-- u
-- m
-- s
-- '
--  
-- w
-- i
-- t
-- h
--  
-- v
-- a
-- l
-- i
-- d
--  
-- '
-- r
-- a
-- t
-- i
-- o
-- '
--  
-- f
-- o
-- r
--  
-- k
-- e
-- y
-- _
-- r
-- a
-- t
-- i
-- o
-- s
-- .
-- d
-- e
-- b
-- t
-- _
-- t
-- o
-- _
-- e
-- q
-- u
-- i
-- t
-- y
--  
-- a
-- n
-- d
--  
-- e
-- n
-- s
-- u
-- r
-- e
-- d
--  
-- t
-- h
-- e
--  
-- m
-- e
-- t
-- r
-- i
-- c
--  
-- i
-- s
--  
-- c
-- o
-- m
-- p
-- u
-- t
-- e
-- d
--  
-- f
-- o
-- r
--  
-- r
-- e
-- c
-- o
-- n
-- c
-- i
-- l
-- i
-- a
-- t
-- i
-- o
-- n
-- .
+- DEGRADED RUN - the LLM was unreachable, so this fixed plan was executed instead.
+- Portfolio and leverage figures aggregated bottom-up from the granular files.
 
 ---
 *Generated by Fund-Raising Document Agent. Figures computed by
-groq/openai/gpt-oss-120b and verified against an
+none (fallback)/deterministic plan and verified against an
 independent recompute. All figures as per Ind AS financial guidelines.*
