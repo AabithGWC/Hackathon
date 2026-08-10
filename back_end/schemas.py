@@ -71,7 +71,32 @@ class GenericAgentResponse(BaseModel):
     data: Dict[str, Any]
 
 
+class ChatMessage(BaseModel):
+    role: str = Field(..., example="user", description="Role: 'user' or 'assistant'")
+    content: str = Field(..., example="What are the top reconciliation breaks?")
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(..., example="Summarize the cashflow forecast and liquidity position.")
+    playbook_name: Optional[str] = Field(
+        None,
+        description="Optional filter for specific agent (e.g. 'reconciliation', 'cashflow_forecasting', 'cof_optimization')",
+        example="cashflow_forecasting",
+    )
+    history: Optional[List[ChatMessage]] = Field(
+        None, description="Optional multi-turn conversation history"
+    )
+
+
+class ChatResponse(BaseModel):
+    success: bool = True
+    reply: str = Field(..., description="LLM response explaining outcomes and reasoning")
+    playbooks_referenced: List[str] = Field(..., example=["reconciliation", "cashflow_forecasting"])
+    timestamp: str = Field(..., example="2026-08-10T13:30:00Z")
+
+
 class ErrorResponse(BaseModel):
     success: bool = False
     error: str
     detail: Optional[str] = None
+

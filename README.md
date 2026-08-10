@@ -66,6 +66,28 @@ This loads the 3 sample CSVs, rule-matches transactions, calls the LLM to adjudi
 each unmatched break plus a run-over-run insights call, validates every LLM response
 against `output_schema.json`, and writes the full result to `agent_runs.db` (SQLite).
 
+## Interactive 7-Agent Outcomes Chatbot
+
+The platform includes an AI Chatbot Assistant (`engine/chatbot.py`) dedicated to explaining, summarizing, and synthesizing calculated outcomes across all 7 agents stored in `agent_runs.db`.
+
+### 1. Interactive Terminal CLI
+```bash
+python engine/chat.py
+```
+Ask natural language questions such as:
+- *"What are the high risk reconciliation breaks?"*
+- *"Summarize our projected cashflow and liquidity buffer surplus."*
+- *"Give me an executive overview of all 7 financial agents."*
+
+### 2. REST API Endpoint
+Send a `POST` request to `/api/v1/chat`:
+```json
+{
+  "message": "Summarize the reconciliation and cashflow agent outcomes.",
+  "playbook_name": null
+}
+```
+
 ## Notes
 
 - The LLM call layer retries once on a schema-validation failure (via `validator.py`)
@@ -73,4 +95,5 @@ against `output_schema.json`, and writes the full result to `agent_runs.db` (SQL
   `llm_client.py`) — both raise a clear error if retries are exhausted.
 - Break adjudication calls run concurrently (bounded pool) for efficiency, one LLM
   call per break, each validated independently against `output_schema.json`.
+
 

@@ -16,6 +16,7 @@ if REPO_ROOT not in sys.path:
 
 from engine import run_agent as generic_runner
 from engine import store
+from engine.chatbot import AgentChatbot
 try:
     from back_end.schemas import (
         HealthResponse,
@@ -24,6 +25,8 @@ try:
         GenericAgentResponse,
         AgentRunSummary,
         AgentRunDetailResponse,
+        ChatRequest,
+        ChatResponse,
     )
 except ImportError:
     from schemas import (
@@ -33,7 +36,10 @@ except ImportError:
         GenericAgentResponse,
         AgentRunSummary,
         AgentRunDetailResponse,
+        ChatRequest,
+        ChatResponse,
     )
+
 
 router = APIRouter(prefix="/api/v1")
 
@@ -223,3 +229,29 @@ def get_run_detail(run_id: str):
         status=run_record["status"],
         result=run_record["result"],
     )
+
+
+# ------------------------------------------------------------------------------
+# 7-AGENT OUTCOMES CHATBOT ASSISTANT
+# ------------------------------------------------------------------------------
+chatbot_instance = AgentChatbot()
+
+
+@router.post("/chat", response_model=ChatResponse, tags=["Chatbot Assistant"])
+def chat_with_agents(body: ChatRequest):
+    try:
+        history_dicts = [h.dict() for h in body.history] if body.history else None
+        res = chatbot_instance.ask(
+            message=body.message,
+            playbook_name=body.playbook_name,
+            chat_history=history_dicts,
+        )
+        return ChatResponse(
+            success=True,
+            reply=res["reply"],
+            playbooks_referenced=res["playbooks_referenced"],
+            timestamp=res["timestamp"],
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Chatbot Assistant error: {str(e)}")
+

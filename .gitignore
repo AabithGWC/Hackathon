@@ -1,5 +1,8 @@
 # Environment & Secret files
+.env
+*.env
 *.env.local
+
 
 # SQLite Databases & Local Run Stores
 *.db
